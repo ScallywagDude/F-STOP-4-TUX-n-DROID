@@ -40,4 +40,4 @@ This repository does not include the game data. You need your own copy of the F-
 This is a non-commercial preservation project with no connection to Valve.
 
 ## AI Disclosure
-Used for placeholder art and CODE AUDITING, theres still a man in there. Lurking.
+Used for placeholder art and CODE AUDITING, theres still a man in there. Lurking. Fixing.
