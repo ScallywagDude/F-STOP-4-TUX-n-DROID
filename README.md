@@ -1,6 +1,6 @@
 # F-STOP
 
-My port of F-STOP, Valve's cancelled Portal 2 prototype, to Android and Linux. It runs on the Source engine with full touch controls, and it plays from start to finish without the portal gun.
+My port of F-STOP, Valve's shelved Portal 2 prototype, to Android and Linux. It runs on the Source engine with full touch controls, and it plays from start to finish without the portal gun.
 
 ## Builds
 
