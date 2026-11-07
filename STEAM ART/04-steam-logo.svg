@@ -1,5 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1840" height="720" viewBox="0 0 1840 720">
-  <rect width="1840" height="720" fill="#000"/>
-  <g transform="translate(200 80) rotate(-7 300 280)"><rect width="600" height="560" rx="44" fill="#f4eddd"/><rect x="48" y="48" width="504" height="382" fill="#fa8420"/><rect x="48" y="430" width="504" height="62" fill="#153941"/><text x="300" y="360" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-weight="bold" font-size="290" fill="#101b1e">f/</text><g transform="translate(111 516)" fill="#11191a"><circle r="51"/><path d="M-5-51h13L1-8l32-33 10 10L8 1l44 5-4 13L7 9l33 33-10 10L0 17l-5 44-13-4 7-45-33 32-10-10 35-33-46-5 4-13 47 7-32-33 10-10L-5-8z" fill="#f4eddd"/></g></g>
-  <text x="900" y="488" font-family="Arial,sans-serif" font-size="218" font-weight="900" letter-spacing="8" fill="#f4eddd">F-STOP</text>
-</svg>
