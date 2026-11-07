@@ -9,18 +9,6 @@ Builds are on the Releases page.
 - **Android:** arm64. I play it on a OnePlus 13 (Adreno 830). Other Adreno phones should work. Tensor phones may work too, though it is very hit or miss. Exynos has not been tested.
 - **Linux / Steam Deck:** x86-64 with native controller support.
 
-The Android APK is larger than GitHub's limit for a single release file, so it is split into parts. Join them first:
-
-```
-cat F-STOP.apk.part* > F-STOP.apk
-```
-
-On Windows, in Command Prompt:
-
-```
-copy /b F-STOP.apk.part00 + F-STOP.apk.part01 F-STOP.apk
-```
-
 ## What I changed
 
 - Ported the game to arm64 on OpenGL ES, with touch controls.
