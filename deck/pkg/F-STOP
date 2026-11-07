@@ -1,0 +1,36 @@
+#!/bin/bash
+# Starts F-STOP. Anything after the name is passed to the game, for example:  F-STOP -w 1920 -h 1080
+HERE="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+cd "$HERE" || exit 1
+
+export LD_LIBRARY_PATH="$HERE/bin:$HERE/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+
+# The game asks fontconfig for Windows fonts; this finds the bundled ones even on a system without them
+FC="${XDG_CACHE_HOME:-$HOME/.cache}/fstop"
+mkdir -p "$FC"
+cat > "$FC/fonts.conf" <<EOF
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+  <dir>$HERE/fonts</dir>
+  <dir>/usr/share/fonts</dir>
+  <cachedir>$FC/fontcache</cachedir>
+  <alias binding="same"><family>Verdana</family><prefer><family>DejaVu Sans</family></prefer></alias>
+  <alias binding="same"><family>Tahoma</family><prefer><family>DejaVu Sans</family></prefer></alias>
+  <alias binding="same"><family>Trebuchet MS</family><prefer><family>DejaVu Sans</family></prefer></alias>
+  <alias binding="same"><family>Arial</family><prefer><family>Liberation Sans</family></prefer></alias>
+  <alias binding="same"><family>Courier New</family><prefer><family>Liberation Mono</family></prefer></alias>
+</fontconfig>
+EOF
+export FONTCONFIG_FILE="$FC/fonts.conf"
+
+# Game Mode and Desktop Mode both offer X11 to games
+[ -n "$DISPLAY" ] && export SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-x11}"
+
+ARGS=(-game fstop -nosteam -novid -fullscreen)
+case " $* " in
+  *" -w "*|*" -width "*) ;;
+  *) ARGS+=(-w 1280 -h 800) ;;
+esac
+
+exec ./hl2_launcher "${ARGS[@]}" "$@"

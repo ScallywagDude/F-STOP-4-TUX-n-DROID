@@ -1,0 +1,10 @@
+// cable/rope came from a later engine branch whose SplineRope shader this engine does not have: use the original Cable version
+const fs = require('fs'), path = require('path');
+const d = 'C:/Program Files (x86)/Steam/steamapps/common/Portal/hl2/';
+const norm = s => s.toLowerCase().split(String.fromCharCode(92)).join('/');
+function find(want) { for (const v of fs.readdirSync(d).filter(x => x.endsWith('_dir.vpk'))) { const a = fs.readFileSync(d + v); let p = 0, tree = 0; if (a.readUInt32LE(0) === 0x55aa1234) { tree = a.readUInt32LE(4) === 1 ? 12 : 28; p = tree; } const ds = tree + (tree ? a.readUInt32LE(8) : 0); const str = () => { const s = p; while (a[p]) p++; const r = a.toString('latin1', s, p); p++; return r; };
+  for (;;) { const e = str(); if (!e) break; for (;;) { const di = str(); if (!di) break; for (;;) { const n = str(); if (!n) break; p += 4; const pre = a.readUInt16LE(p); p += 2; const arc = a.readUInt16LE(p); p += 2; const off = a.readUInt32LE(p); p += 4; const len = a.readUInt32LE(p); p += 6; const pd = a.subarray(p, p + pre); p += pre; if (norm(di + '/' + n + '.' + e) === want) { const parts = [Buffer.from(pd)]; if (len) { const af = arc === 0x7fff ? d + v : d + v.replace('_dir.vpk', '_' + String(arc).padStart(3, '0') + '.vpk'); const fd = fs.openSync(af, 'r'); const x = Buffer.alloc(len); fs.readSync(fd, x, 0, len, arc === 0x7fff ? off + ds : off); fs.closeSync(fd); parts.push(x); } return Buffer.concat(parts); } } } } } return null; }
+let t = find('materials/cable/rope.vmt'); console.log(t ? t.toString('latin1') : 'no original');
+if (!t) t = Buffer.from('"Cable"\n{\n\t"$basetexture"\t"cable/rope"\n\t"$bumpmap"\t"cable/cablenormalmap"\n\t"$vertexcolor"\t1\n\t"$nocull"\t1\n}\n');
+for (const f of [(__dirname + '/../tools/loose_materials/materials/cable/rope.vmt'), (__dirname + '/../fsdata/fstop/materials/cable/rope.vmt')]) { fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, t); }
+const b = require('../out/bundle.json'); for (const m of (t.toString('latin1').match(/"\$(?:basetexture|bumpmap)"\s+"([^"]+)"/gi) || [])) { const v = m.split('"')[3]; console.log(v, !!b['materials/' + norm(v) + '.vtf']); }

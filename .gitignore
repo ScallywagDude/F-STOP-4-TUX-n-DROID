@@ -1,0 +1,12 @@
+# game data and build output stay out of the repository
+fsdata/
+maps/
+out/
+apkbuild/
+keys/
+fstop_libs/
+engine/build/
+*.apk
+*.idsig
+*.o
+.lock-waf*

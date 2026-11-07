@@ -1,0 +1,22 @@
+"GameInfo"
+{
+	game	"F-STOP"
+	title	"F-STOP"
+	type	singleplayer_only
+	nodifficulty	1
+	hasportals	1
+	FileSystem
+	{
+		SteamAppId	400
+		SearchPaths
+		{
+			gamebin	|gameinfo_path|bin
+			mod+mod_write+default_write_path	|gameinfo_path|.
+			game+game_write	|gameinfo_path|.
+			game+mod	fstop/fstop_pak.vpk
+			platform	|all_source_engine_paths|platform/platform_misc.vpk
+			game	fstop
+			platform	|all_source_engine_paths|platform
+		}
+	}
+}
