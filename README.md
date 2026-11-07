@@ -38,3 +38,6 @@ This repository does not include the game data. You need your own copy of the F-
 - **Valve:** F-STOP, Portal 2 and the Source engine are theirs.
 
 This is a non-commercial preservation project with no connection to Valve.
+
+## AI Disclosure
+Used for placeholder art and CODE AUDITING, theres still a man in there. Lurking.
