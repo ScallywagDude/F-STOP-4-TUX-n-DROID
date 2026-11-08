@@ -16,7 +16,7 @@ Builds are on the Releases page.
 - Fixed water reflections and refractions, moving platform lighting and cubemaps, and recompiled the maps with new cubemaps.
 - Added working 4x MSAA on Android and fixed multicore rendering.
 - Ported the Portal 2 style menus from P2ASW, using the UI only. Settings apply for real and save between launches.
-- Removed the five hybrid maps, the portal gun and the HEV HUD elements.
+- Removed the five hybrid maps, the portal gun and the HEV HUD elements. It caused quite a few issues and cutting a lot of it from the game just seemed like the easiest option in the moment.
 
 ## Project layout
 
