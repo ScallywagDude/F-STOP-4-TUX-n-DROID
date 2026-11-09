@@ -19,6 +19,8 @@
 #include "vkeybindings.h"
 #include "ienginevgui.h"
 #include "vgui/ISurface.h"
+#include "vgui/IInput.h"
+#include "vgui/IPanel.h"
 #include "vgui/IVGui.h"
 #include "vgui/IScheme.h"
 #include "vgui/ILocalize.h"
@@ -178,6 +180,10 @@ CBaseModPanel::CBaseModPanel() : BaseClass( NULL, "BaseModPanel" )
 	m_bClosingAllWindows = false;
 	m_bWasVisible = false;
 	m_bHasInGameMenu = false;
+	m_bControllerActive = false;
+	m_nLastActiveUserId = 0;
+	m_RepeatKey = BUTTON_CODE_NONE;
+	m_flNextControllerRepeat = 0;
 	m_hDefaultFont = INVALID_FONT;
 	for ( int k = 0; k < WPRI_COUNT; ++k )
 		m_ActiveWindow[k] = WT_NONE;
@@ -254,6 +260,7 @@ void CBaseModPanel::OnThink()
 		if ( bInLevel != m_bHasInGameMenu && GetActiveWindowPriority() <= WPRI_NORMAL )
 			OpenFrontScreen();
 	}
+	UpdateControllerKeyRepeat();
 }
 
 void CBaseModPanel::OnGameUIActivated()
@@ -469,6 +476,82 @@ void CBaseModPanel::StartExitingProcess( bool )
 void CBaseModPanel::OnCommand( const char *command )
 {
 	BaseClass::OnCommand( command );
+}
+
+void CBaseModPanel::OnSetFocus()
+{
+	BaseClass::OnSetFocus();
+
+	// GameUI requests focus on the override root whenever it opens the menu.
+	// Give it back to the visible window instead of leaving input on this container.
+	CBaseModFrame *pFrame = GetWindow( GetActiveWindowType() );
+	if ( pFrame )
+		pFrame->RestoreFocusToActiveControl();
+}
+
+void CBaseModPanel::OnKeyCodePressed( KeyCode code )
+{
+	OnMenuKeyPressed( code );
+	CBaseModFrame *pFrame = GetWindow( GetActiveWindowType() );
+	if ( input()->GetFocus() == GetVPanel() && pFrame )
+	{
+		pFrame->RestoreFocusToActiveControl();
+		Panel *pControl = pFrame->GetActiveControl();
+		VPANEL target = pControl ? pControl->GetCurrentKeyFocus() : NULL;
+		if ( !target )
+			target = pControl ? pControl->GetVPanel() : pFrame->GetVPanel();
+		PostMessage( target, new KeyValues( "KeyCodePressed", "code", code ) );
+		return;
+	}
+	BaseClass::OnKeyCodePressed( code );
+}
+
+void CBaseModPanel::OnMenuKeyPressed( KeyCode code )
+{
+	bool bController = IsJoystickCode( code ) || IsSteamControllerCode( code );
+	SetControllerActive( bController );
+	if ( bController )
+		SetLastActiveUserId( GetJoystickForCode( code ) );
+}
+
+void CBaseModPanel::UpdateControllerKeyRepeat()
+{
+	// The engine's VGUI repeater is disabled on PC, including Linux and Android.
+	CBaseModFrame *pFrame = GetWindow( GetActiveWindowType() );
+	VPANEL focus = input()->GetFocus();
+	if ( !IsPC() || !enginevgui->IsGameUIVisible() || !IsControllerActive() || !pFrame ||
+		!focus || ( focus != pFrame->GetVPanel() && !ipanel()->HasParent( focus, pFrame->GetVPanel() ) ) )
+	{
+		m_RepeatKey = BUTTON_CODE_NONE;
+		return;
+	}
+	static const KeyCode directions[] = {
+		KEY_XBUTTON_UP, KEY_XBUTTON_DOWN, KEY_XBUTTON_LEFT, KEY_XBUTTON_RIGHT,
+		KEY_XSTICK1_UP, KEY_XSTICK1_DOWN, KEY_XSTICK1_LEFT, KEY_XSTICK1_RIGHT,
+		KEY_XSTICK2_UP, KEY_XSTICK2_DOWN, KEY_XSTICK2_LEFT, KEY_XSTICK2_RIGHT,
+		STEAMCONTROLLER_DPAD_UP, STEAMCONTROLLER_DPAD_DOWN, STEAMCONTROLLER_DPAD_LEFT, STEAMCONTROLLER_DPAD_RIGHT
+	};
+	KeyCode held = BUTTON_CODE_NONE;
+	for ( int i = 0; i < ARRAYSIZE( directions ); ++i )
+	{
+		KeyCode code = ButtonCodeToJoystickButtonCode( directions[i], GetLastActiveUserId() );
+		if ( input()->IsKeyDown( code ) )
+		{
+			held = code;
+			break;
+		}
+	}
+	float now = Plat_FloatTime();
+	if ( held != m_RepeatKey )
+	{
+		m_RepeatKey = held;
+		m_flNextControllerRepeat = now + 0.4f;
+	}
+	else if ( held != BUTTON_CODE_NONE && now >= m_flNextControllerRepeat )
+	{
+		PostMessage( focus, new KeyValues( "KeyCodePressed", "code", held ) );
+		m_flNextControllerRepeat = now + 0.16f;
+	}
 }
 
 bool CBaseModPanel::OpenMessageDialog( const char *lpszTitle, const char *lpszMessage )

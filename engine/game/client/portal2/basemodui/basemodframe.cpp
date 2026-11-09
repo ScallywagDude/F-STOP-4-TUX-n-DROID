@@ -8,6 +8,7 @@
 // Client-tracing
 #include "cbase.h"
 #include "vgui/IInput.h"
+#include "vgui/IPanel.h"
 #include "view_shared.h"
 #include "cdll_client_int.h"
 #ifdef XBX_GetPrimaryUserId
@@ -274,6 +275,8 @@ void CBaseModFrame::LoadLayout()
 	}
 
 	m_bLayoutLoaded = true;
+	ConfigureMenuNavigation();
+	FindAndSetActiveControl();
 
 	// if we were supposed to take modal input focus, do it now
 	if ( m_bDelayPushModalInputFocus )
@@ -301,6 +304,7 @@ void CBaseModFrame::ReloadSettings()
 //=============================================================================
 void CBaseModFrame::OnKeyCodePressed(KeyCode keycode)
 {
+	CBaseModPanel::GetSingleton().OnMenuKeyPressed( keycode );
 	int lastUser = GetJoystickForCode( keycode );
 	BaseModUI::CBaseModPanel::GetSingleton().SetLastActiveUserId( lastUser );
 
@@ -316,12 +320,14 @@ void CBaseModFrame::OnKeyCodePressed(KeyCode keycode)
 		}
 		break;
 	case KEY_XBUTTON_A:
+	case STEAMCONTROLLER_A:
 		if(m_OkButtonEnabled)
 		{
 			BaseClass::OnKeyCodePressed(keycode);
 		}
 		break;
 	case KEY_XBUTTON_B:
+	case STEAMCONTROLLER_B:
 		if(m_CancelButtonEnabled)
 		{
 			CBaseModPanel::GetSingleton().PlayUISound( UISOUND_BACK );
@@ -403,6 +409,7 @@ void CBaseModFrame::OnKeyCodeTyped( vgui::KeyCode code )
 
 void CBaseModFrame::OnMousePressed( vgui::MouseCode code )
 {
+	CBaseModPanel::GetSingleton().SetControllerActive( false );
 	if ( m_pVuiSettings )
 	{
 		char const *szHitTest = GetEntityOverMouseCursorInEngine();
@@ -557,11 +564,8 @@ void CBaseModFrame::OnOpen()
 	
 	SetAlpha(255);//make sure we show up.
 	Activate();
-
-	if ( m_ActiveControl != 0 )
-	{
-		m_ActiveControl->NavigateTo();
-	}
+	ConfigureMenuNavigation();
+	RestoreFocusToActiveControl();
 
 	// close active menu if there is one
 	FlyoutMenu::CloseActiveMenu();
@@ -752,20 +756,79 @@ void CBaseModFrame::PaintBackground()
 //=============================================================================
 void CBaseModFrame::FindAndSetActiveControl()
 {
+	Panel *pPrevious = NULL;
+	Panel *pDefault = NULL;
+	int nDefaultTab = INT_MAX;
+	VPANEL focus = input()->GetFocus();
+	for ( int i = 0; i < GetChildCount(); ++i )
+	{
+		Panel *pChild = GetChild( i );
+		if ( !pChild->IsVisible() || !pChild->IsEnabled() || !pChild->IsKeyBoardInputEnabled() )
+			continue;
+		if ( focus == pChild->GetVPanel() || ( focus && ipanel()->HasParent( focus, pChild->GetVPanel() ) ) )
+		{
+			m_ActiveControl = pChild;
+			return;
+		}
+		if ( pChild == m_ActiveControl )
+			pPrevious = pChild;
+		int nTab = pChild->GetTabPosition();
+		if ( nTab > 0 && nTab < nDefaultTab )
+		{
+			pDefault = pChild;
+			nDefaultTab = nTab;
+		}
+		else if ( !pDefault && dynamic_cast< Button * >( pChild ) )
+		{
+			pDefault = pChild;
+		}
+	}
+	m_ActiveControl = pPrevious ? pPrevious : pDefault;
 }
 
 void CBaseModFrame::RestoreFocusToActiveControl()
 {
-	RequestFocus();
+	FindAndSetActiveControl();
 	if ( m_ActiveControl )
 	{
 		m_ActiveControl->NavigateTo();
+		m_ActiveControl->RequestFocus();
 	}
 	else
 	{
+		RequestFocus();
 	}
 }
 
+void CBaseModFrame::ConfigureMenuNavigation()
+{
+	// PC menu resources may have tab order without console navigation links.
+	if ( GetWindowType() != WT_MAINMENU && GetWindowType() != WT_INGAMEMAINMENU && GetWindowType() != WT_OPTIONS )
+		return;
+	CUtlVector< Button * > buttons;
+	for ( int i = 0; i < GetChildCount(); ++i )
+	{
+		Button *pButton = dynamic_cast< Button * >( GetChild( i ) );
+		if ( !pButton || !pButton->IsVisible() || !pButton->IsEnabled() || !pButton->IsKeyBoardInputEnabled() )
+			continue;
+		int x, y;
+		pButton->GetPos( x, y );
+		int nInsert = 0;
+		for ( ; nInsert < buttons.Count(); ++nInsert )
+		{
+			int otherX, otherY;
+			buttons[nInsert]->GetPos( otherX, otherY );
+			if ( y < otherY || ( y == otherY && x < otherX ) )
+				break;
+		}
+		buttons.InsertBefore( nInsert, pButton );
+	}
+	for ( int i = 0; i < buttons.Count(); ++i )
+	{
+		buttons[i]->SetNavUp( buttons[( i + buttons.Count() - 1 ) % buttons.Count()] );
+		buttons[i]->SetNavDown( buttons[( i + 1 ) % buttons.Count()] );
+	}
+}
 
 //=============================================================================
 void CBaseModFrame::RunFrame()
@@ -781,6 +844,7 @@ void CBaseModFrame::OnNavigateTo( const char* panelName )
 		if(child != NULL && (!Q_strcmp(panelName, child->GetName())))
 		{						
 			m_ActiveControl = child;
+			m_ActiveControl->RequestFocus();
 
 			if ( BaseModHybridButton *pButton = dynamic_cast< BaseModHybridButton * >( m_ActiveControl ) )
 			{

@@ -1954,19 +1954,17 @@ bool RestorePhysicsObject( const physrestoreparams_t &params, CPhysicsObject **p
 
 IPhysicsObject *CreateObjectFromBuffer( CPhysicsEnvironment *pEnvironment, void *pGameData, unsigned char *pBuffer, unsigned int bufferSize, bool enableCollisions )
 {
+	if ( bufferSize < sizeof(vphysics_save_cphysicsobject_t) )
+		return NULL;
+
+	// InitFromTemplate enables collisions from the template itself. Apply the
+	// caller's override before initialization, without changing the source buffer.
+	vphysics_save_cphysicsobject_t objectTemplate = *reinterpret_cast<const vphysics_save_cphysicsobject_t *>(pBuffer);
+	objectTemplate.hasShadowController = false;
+	objectTemplate.collisionEnabled = objectTemplate.collisionEnabled && enableCollisions;
 	CPhysicsObject *pObject = new CPhysicsObject();
-	if ( bufferSize >= sizeof(vphysics_save_cphysicsobject_t))
-	{
-		vphysics_save_cphysicsobject_t *pTemplate = reinterpret_cast<vphysics_save_cphysicsobject_t *>(pBuffer);
-		pTemplate->hasShadowController = false; // this hasn't been saved separately so cannot be supported via this path
-		pObject->InitFromTemplate( pEnvironment, pGameData, *pTemplate );
-		if ( pTemplate->collisionEnabled && enableCollisions )
-		{
-			pObject->EnableCollisions(true);
-		}
-		return pObject;
-	}
-	return NULL;
+	pObject->InitFromTemplate( pEnvironment, pGameData, objectTemplate );
+	return pObject;
 }
 
 IPhysicsObject *CreateObjectFromBuffer_UseExistingMemory( CPhysicsEnvironment *pEnvironment, void *pGameData, unsigned char *pBuffer, unsigned int bufferSize, CPhysicsObject *pExistingMemory )

@@ -2,10 +2,12 @@
 fsdata/
 maps/
 out/
+.port-build/
 apkbuild/
 keys/
 fstop_libs/
 engine/build/
+/install/
 *.apk
 *.idsig
 *.o

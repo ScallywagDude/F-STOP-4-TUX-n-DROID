@@ -406,6 +406,11 @@ void CPhysicsShadowClone::SyncEntity( bool bPullChanges )
 static void FullSyncPhysicsObject( IPhysicsObject *pSource, IPhysicsObject *pDest, const VMatrix *pTransform, bool bTeleport )
 {
 	CGrabController *pGrabController = NULL;
+	const bool bEnableCollisions = pSource->IsCollisionEnabled();
+	// New clones are created inert. Suspend existing contacts only for a
+	// teleport; ordinary per-tick synchronization must preserve its contacts.
+	if ( bTeleport || !bEnableCollisions )
+		pDest->EnableCollisions( false );
 
 	if( !pSource->IsAsleep() )
 		pDest->Wake();
@@ -439,7 +444,6 @@ static void FullSyncPhysicsObject( IPhysicsObject *pSource, IPhysicsObject *pDes
 		pDest->SetMaterialIndex( pSource->GetMaterialIndex() );
 		pDest->SetContents( pSource->GetContents() );
 
-		pDest->EnableCollisions( pSource->IsCollisionEnabled() );
 		pDest->EnableGravity( pSource->IsGravityEnabled() );
 		pDest->EnableDrag( pSource->IsDragEnabled() );
 		pDest->EnableMotion( pSource->IsMotionEnabled() );
@@ -547,6 +551,8 @@ static void FullSyncPhysicsObject( IPhysicsObject *pSource, IPhysicsObject *pDes
 		
 	}
 
+	// Collision callbacks must see the clone at its final transformed position.
+	pDest->EnableCollisions( bEnableCollisions );
 	//pDest->RecheckContactPoints();
 }
 

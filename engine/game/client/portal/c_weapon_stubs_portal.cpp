@@ -36,7 +36,27 @@ STUB_WEAPON_CLASS( weapon_slam, Weapon_SLAM, C_BaseHLCombatWeapon );
 STUB_WEAPON_CLASS( weapon_crowbar, WeaponCrowbar, C_BaseHLBludgeonWeapon );
 STUB_WEAPON_CLASS( weapon_hopwire, WeaponHopwire, C_BaseHLCombatWeapon );
 #ifdef PORTAL2
-STUB_WEAPON_CLASS( weapon_camera, WeaponCamera, C_BaseCombatWeapon );
+// The server uses camera viewmodel sequences, while this client weapon renders
+// its world model. Network updates can supply a sequence that model lacks.
+class C_FStopCameraWeapon : public C_BaseCombatWeapon
+{
+	DECLARE_CLASS( C_FStopCameraWeapon, C_BaseCombatWeapon );
+public:
+	virtual void OnDataChanged( DataUpdateType_t updateType )
+	{
+		BaseClass::OnDataChanged( updateType );
+		if ( GetModelIndex() != GetWorldModelIndex() )
+			return;
+
+		CStudioHdr *pStudioHdr = GetModelPtr();
+		if ( pStudioHdr && pStudioHdr->GetNumSeq() > 0 &&
+			( GetSequence() < 0 || GetSequence() >= pStudioHdr->GetNumSeq() ) )
+		{
+			ResetSequence( 0 );
+		}
+	}
+};
+STUB_WEAPON_CLASS( weapon_camera, WeaponCamera, C_FStopCameraWeapon );
 STUB_WEAPON_CLASS( weapon_placement, WeaponPlacement, C_BaseCombatWeapon );
 #endif // PORTAL2
 

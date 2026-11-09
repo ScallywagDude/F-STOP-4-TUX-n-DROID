@@ -38,6 +38,13 @@ public:
 
 	enum { kMAXCONTROLPOINTS = 63 }; ///< actually one less than the total number of cpoints since 0 is assumed to be me
 
+	void SetControlPointEntity( int nControlPoint, CBaseEntity *pEntity )
+	{
+		Assert( nControlPoint > 0 && nControlPoint <= kMAXCONTROLPOINTS );
+		if ( nControlPoint > 0 && nControlPoint <= kMAXCONTROLPOINTS )
+			m_hControlPointEnts.Set( nControlPoint - 1, pEntity );
+	}
+
 protected:
 
 	/// Load up and resolve the entities that are supposed to be the control points 

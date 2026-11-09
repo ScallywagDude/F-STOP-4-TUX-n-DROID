@@ -16,6 +16,10 @@
 #include "tier0/icommandline.h"
 #include "vgui_controls/Button.h"
 #include "viewrender.h"
+#ifdef FSTOP_TEST_HARNESS
+#include <stdio.h>
+#include <stdlib.h>
+#endif
 
 #if defined( PORTAL2 ) && defined( LINUX ) && !defined( ANDROID )
 #define FSTOP_DECK_TRACKPAD
@@ -69,6 +73,10 @@ ConVar touch_button_info( "touch_button_info", "0", FCVAR_ARCHIVE );
 extern IVEngineClient *engine;
 
 CTouchControls gTouch;
+#ifdef PORTAL2
+static int s_sliderFinger = -1;
+static float s_sliderValue = 0.5f, s_sliderSent = -1.0f;
+#endif
 static VTouchPanel g_TouchPanel;
 VTouchPanel *touch_panel = &g_TouchPanel;
 
@@ -292,8 +300,41 @@ CON_COMMAND( touch_toggleselection, "toggle visibility on selected button in edi
 
 }*/
 
+void CTouchControls::ReleaseAllFingers()
+{
+	forward = side = yaw = pitch = 0.0f;
+	m_flPreviousYaw = m_flPreviousPitch = 0.0f;
+	movecount = 0.0f;
+	look_finger = move_finger = wheel_finger = resize_finger = -1;
+	move_button = NULL;
+#ifdef PORTAL2
+	if ( s_sliderFinger != -1 )
+		s_sliderSent = -1.0f;
+	s_sliderFinger = -1;
+#endif
+	if ( !initialized )
+		return;
+
+	for ( CUtlLinkedList<CTouchButton*>::iterator it = btns.begin(); it != btns.end(); ++it )
+	{
+		CTouchButton *button = *it;
+		if ( button->finger == -1 )
+			continue;
+		button->finger = -1;
+		if ( button->command[0] == '+' )
+		{
+			char command[256];
+			V_strncpy( command, button->command, sizeof( command ) );
+			command[0] = '-';
+			engine->ClientCmd_Unrestricted( command );
+		}
+	}
+}
+
 void CTouchControls::GetTouchAccumulators( float *side, float *forward, float *yaw, float *pitch )
 {
+	if ( !touch_enable.GetBool() || enginevgui->IsGameUIVisible() )
+		ReleaseAllFingers();
 	*forward = this->forward;
 	*side = this->side;
 	*pitch = this->pitch;
@@ -646,6 +687,38 @@ void CTouchControls::Frame()
 	DeckTrackpadPoll();
 #endif
 
+#ifdef FSTOP_TEST_HARNESS
+	// Test builds opt in at compile time and on the command line. Android's
+	// debuggable launcher supplies an app-private path writable through run-as;
+	// there is deliberately no shared-storage or network command source.
+	static int s_commandTick = 0;
+	static char s_lastCommand[1024] = "";
+	const char *pCommandPath = getenv( "FSTOP_TEST_COMMAND_PATH" );
+	if ( CommandLine()->FindParm( "-fstopcmd" ) && pCommandPath && pCommandPath[0] && ++s_commandTick >= 15 )
+	{
+		s_commandTick = 0;
+		FILE *pCommandFile = fopen( pCommandPath, "rb" );
+		if ( pCommandFile )
+		{
+			char command[1024];
+			size_t bytesRead = fread( command, 1, sizeof( command ) - 2, pCommandFile );
+			fclose( pCommandFile );
+			// Consume before execution so a crashing test command is not replayed
+			// automatically on the next app launch.
+			remove( pCommandPath );
+			command[bytesRead] = '\0';
+			if ( command[0] && V_strcmp( command, s_lastCommand ) )
+			{
+				V_strncpy( s_lastCommand, command, sizeof( s_lastCommand ) );
+				V_strncat( command, "\n", sizeof( command ) );
+				engine->ClientCmd_Unrestricted( command );
+			}
+		}
+	}
+#endif
+
+	if ( !touch_enable.GetBool() || enginevgui->IsGameUIVisible() )
+		ReleaseAllFingers();
 
 	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
 
@@ -693,9 +766,6 @@ static ConVar fstop_bumper_resize( "fstop_bumper_resize", "0", FCVAR_ARCHIVE, "Z
 enum { SLIDER_NONE, SLIDER_ZOOM, SLIDER_SIZE };
 
 static const float SLIDER_X1 = 0.016f, SLIDER_X2 = 0.056f, SLIDER_Y1 = 0.20f, SLIDER_Y2 = 0.84f, SLIDER_HIT_X2 = 0.11f;
-
-static int s_sliderFinger = -1;
-static float s_sliderValue = 0.5f, s_sliderSent = -1.0f;
 
 bool FStopBumpersActive();
 
@@ -1197,8 +1267,11 @@ CTouchButton *CTouchControls::FindButton( const char *name )
 
 void CTouchControls::ProcessEvent(touch_event_t *ev)
 {
-	if( !touch_enable.GetBool() || !HasTouchscreen() )
+	if( !touch_enable.GetBool() || !HasTouchscreen() || enginevgui->IsGameUIVisible() )
+	{
+		ReleaseAllFingers();
 		return;
+	}
 
 	if( state == state_edit )
 	{

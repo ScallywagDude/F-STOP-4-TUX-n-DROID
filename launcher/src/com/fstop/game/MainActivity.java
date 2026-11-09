@@ -30,7 +30,7 @@ import org.libsdl.app.SDLActivity;
 public class MainActivity extends Activity {
 	private static final String TAG = "FSTOP";
 	private static final String MANIFEST = "fstop_manifest.txt";
-	private static final int DATA_VERSION = 18;
+	private static final int DATA_VERSION = 20;
 
 	private ProgressBar mBar;
 	private TextView mText;

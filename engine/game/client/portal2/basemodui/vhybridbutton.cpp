@@ -290,6 +290,7 @@ void BaseModHybridButton::OnSiblingHybridButtonOpened()
 
 void BaseModHybridButton::OnMousePressed( vgui::MouseCode code )
 {
+	CBaseModPanel::GetSingleton().SetControllerActive( false );
 	BaseClass::OnMousePressed( code );
 	if ( IsPC() )
 	{
@@ -1077,6 +1078,7 @@ void BaseModHybridButton::OnKeyCodePressed( vgui::KeyCode code )
 		}
 	}
 
+	CBaseModPanel::GetSingleton().OnMenuKeyPressed( code );
 	BaseModUI::CBaseModPanel::GetSingleton().SetLastActiveUserId( iJoystick );
 
 	int iController = XBX_GetUserId( iJoystick );
@@ -1084,7 +1086,7 @@ void BaseModHybridButton::OnKeyCodePressed( vgui::KeyCode code )
 
 	KeyCode localCode = GetBaseButtonCode( code );
 
-	if ( ( localCode == KEY_XBUTTON_A ) )
+	if ( localCode == KEY_XBUTTON_A || localCode == STEAMCONTROLLER_A )
 	{
 		if ( m_bIgnoreButtonA )
 		{
@@ -1134,6 +1136,7 @@ void BaseModHybridButton::OnKeyCodePressed( vgui::KeyCode code )
 		switch ( localCode )
 		{
 		case KEY_XBUTTON_A:
+		case STEAMCONTROLLER_A:
 			ChangeDialogListSelection( SELECT_NEXT );
 			break;
 
@@ -1141,6 +1144,7 @@ void BaseModHybridButton::OnKeyCodePressed( vgui::KeyCode code )
 		case KEY_XSTICK2_LEFT:
 		case KEY_XBUTTON_LEFT:
 		case KEY_XBUTTON_LEFT_SHOULDER:
+		case STEAMCONTROLLER_DPAD_LEFT:
 		case KEY_LEFT:
 			ChangeDialogListSelection( SELECT_PREV );
 			break;
@@ -1149,6 +1153,7 @@ void BaseModHybridButton::OnKeyCodePressed( vgui::KeyCode code )
 		case KEY_XSTICK2_RIGHT:
 		case KEY_XBUTTON_RIGHT:
 		case KEY_XBUTTON_RIGHT_SHOULDER:
+		case STEAMCONTROLLER_DPAD_RIGHT:
 		case KEY_RIGHT:
 			ChangeDialogListSelection( SELECT_NEXT );
 			break;

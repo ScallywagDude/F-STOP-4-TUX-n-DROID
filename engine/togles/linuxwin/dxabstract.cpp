@@ -1171,7 +1171,9 @@ static void FillD3DCaps9( const GLMRendererInfoFields &glmRendererInfo, D3DCAPS9
 
 	// start it out set to '2'.
 	// turn it off, if we're in GLSL mode but do not have native clip plane capability.
-	pCaps->MaxUserClipPlanes			=	2;		// assume good news
+	// GLES shaders do not emit user clip distances. Advertise that accurately so
+	// the material system uses its projection/depth clipping fallback for portals.
+	pCaps->MaxUserClipPlanes			=	0;
 
 	// is user asking for it to be off ?
 	if ( CommandLine()->CheckParm( "-nouserclip" ) )

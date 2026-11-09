@@ -145,8 +145,10 @@ namespace BaseModUI {
 		WINDOW_PRIORITY GetWindowPriority();
 
 		void RestoreFocusToActiveControl();
+		vgui::Panel *GetActiveControl() const { return m_ActiveControl; }
 
 	protected:
+		void ConfigureMenuNavigation();
 		virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
 		virtual void ApplySettings(KeyValues *inResourceData);
 		virtual void PerformLayout();

@@ -1271,7 +1271,7 @@ void CViewRender::DrawUnderwaterOverlay( void )
 {
 	IMaterial *pOverlayMat = m_UnderWaterOverlayMaterial;
 
-	if ( pOverlayMat )
+	if ( pOverlayMat && !pOverlayMat->IsErrorMaterial() )
 	{
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
@@ -2498,7 +2498,29 @@ static void FStopScanAnalogWater()
 	}
 }
 
-// Fills in a water surface if the view is above a sea of this kind and no world water is in sight.
+// Dynamic water has no world-leaf fog classification. Its underwater view is
+// valid only inside the actual moving brush bounds, not below a nearby sea.
+static bool FStopAnalogWaterContainsEye( const Vector &eye, const Vector &mins, const Vector &maxs )
+{
+	return eye.x >= mins.x && eye.x <= maxs.x && eye.y >= mins.y && eye.y <= maxs.y &&
+		eye.z >= mins.z && eye.z < maxs.z;
+}
+
+static IMaterial *FStopWaterFogMaterial( IMaterial *pSurface, bool bUnderwater )
+{
+	if ( !pSurface || !bUnderwater )
+		return pSurface;
+	IMaterialVar *pBottom = pSurface->FindVar( "$bottommaterial", NULL, false );
+	if ( pBottom && pBottom->IsDefined() && pBottom->GetStringValue()[0] && Q_stricmp( pBottom->GetStringValue(), "0" ) )
+	{
+		IMaterial *pMaterial = materials->FindMaterial( pBottom->GetStringValue(), TEXTURE_GROUP_OTHER );
+		if ( pMaterial && !pMaterial->IsErrorMaterial() )
+			return pMaterial;
+	}
+	return pSurface;
+}
+
+// Fills in the moving sea when no world water volume describes this view.
 static void FStopFindAnalogWater( const Vector &vecOrigin, VisibleFogVolumeInfo_t &fogInfo )
 {
 	s_bFStopAnalogWaterActive = false;
@@ -2524,8 +2546,8 @@ static void FStopFindAnalogWater( const Vector &vecOrigin, VisibleFogVolumeInfo_
 		vecMins += pEnt->GetAbsOrigin();
 		vecMaxs += pEnt->GetAbsOrigin();
 
-		// from under the surface the view stays as it was
-		if ( vecOrigin.z <= vecMaxs.z )
+		bool bEyeInWater = FStopAnalogWaterContainsEye( vecOrigin, vecMins, vecMaxs );
+		if ( vecOrigin.z < vecMaxs.z && !bEyeInWater )
 			continue;
 
 		float dx = MAX( MAX( vecMins.x - vecOrigin.x, vecOrigin.x - vecMaxs.x ), 0.0f );
@@ -2541,9 +2563,9 @@ static void FStopFindAnalogWater( const Vector &vecOrigin, VisibleFogVolumeInfo_
 		flBestDist = flDist;
 		fogInfo.m_pFogVolumeMaterial = pMaterial;
 		fogInfo.m_flWaterHeight = vecMaxs.z;
-		fogInfo.m_flDistanceToWater = vecOrigin.z - vecMaxs.z;
+		fogInfo.m_flDistanceToWater = fabsf( vecOrigin.z - vecMaxs.z );
 		fogInfo.m_nVisibleFogVolumeLeaf = -1;
-		fogInfo.m_bEyeInFogVolume = false;
+		fogInfo.m_bEyeInFogVolume = bEyeInWater;
 		s_bFStopAnalogWaterActive = true;
 	}
 }
@@ -2552,10 +2574,40 @@ static void FStopFindAnalogWater( const Vector &vecOrigin, VisibleFogVolumeInfo_
 // so the brush drawing code asks here instead.
 static bool s_bFStopInWaterView = false;
 
-static void FStopHideAnalogWater( bool bHide )
+// Portal views can find a different sea (or no sea) while the parent view is
+// still rendering. Restore the parent's state on every exit, including cheap water.
+class CScopedFStopAnalogWaterView
 {
-	s_bFStopInWaterView = bHide && s_bFStopAnalogWaterActive;
-}
+public:
+	CScopedFStopAnalogWaterView()
+		: m_bSavedActive( s_bFStopAnalogWaterActive ), m_bSavedInWaterView( s_bFStopInWaterView )
+	{
+		s_bFStopAnalogWaterActive = false;
+	}
+	~CScopedFStopAnalogWaterView()
+	{
+		s_bFStopAnalogWaterActive = m_bSavedActive;
+		s_bFStopInWaterView = m_bSavedInWaterView;
+	}
+private:
+	bool m_bSavedActive;
+	bool m_bSavedInWaterView;
+};
+
+class CScopedFStopWaterTarget
+{
+public:
+	CScopedFStopWaterTarget() : m_bSavedInWaterView( s_bFStopInWaterView )
+	{
+		s_bFStopInWaterView = s_bFStopInWaterView || s_bFStopAnalogWaterActive;
+	}
+	~CScopedFStopWaterTarget()
+	{
+		s_bFStopInWaterView = m_bSavedInWaterView;
+	}
+private:
+	bool m_bSavedInWaterView;
+};
 
 bool FStopSkipBrushInWaterView( const C_BaseEntity *pEnt )
 {
@@ -2737,6 +2789,7 @@ void CViewRender::DrawWorldAndEntities( bool bDrawSkybox, const CViewSetup &view
 {
 	MDLCACHE_CRITICAL_SECTION();
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
+	CScopedFStopAnalogWaterView analogWaterView;
 
 	VisibleFogVolumeInfo_t fogVolumeInfo;
 #ifdef PORTAL //in portal, we can't use the fog volume for the camera since it's almost never in the same fog volume as what's in front of the portal
@@ -2896,6 +2949,7 @@ bool DoesViewPlaneIntersectWater( float waterZ, int leafWaterDataID )
 void CViewRender::ViewDrawScene_PortalStencil( const CViewSetup &viewIn, ViewCustomVisibility_t *pCustomVisibility )
 {
 	VPROF( "CViewRender::ViewDrawScene_PortalStencil" );
+	CScopedFStopAnalogWaterView analogWaterView;
 
 	CViewSetup view( viewIn );
 
@@ -2935,6 +2989,7 @@ void CViewRender::ViewDrawScene_PortalStencil( const CViewSetup &viewIn, ViewCus
 		render->GetVisibleFogVolume( g_pPortalRender->GetExitPortalFogOrigin(), &fogInfo );
 	}
 
+	FStopFindAnalogWater( viewIn.origin, fogInfo );
 	WaterRenderInfo_t waterInfo;
 	DetermineWaterRenderInfo( fogInfo, waterInfo );
 
@@ -4855,11 +4910,38 @@ int CRendering3dView::GetDrawFlags()
 //-----------------------------------------------------------------------------
 void CRendering3dView::SetFogVolumeState( const VisibleFogVolumeInfo_t &fogInfo, bool bUseHeightFog )
 {
-	// F-STOP: a func_water_analog sea has no world fog volume for the engine to look up
+	// Dynamic water has no engine fog-volume ID. Apply the same material fog
+	// settings directly, using the underside material for an underwater eye.
 	if ( s_bFStopAnalogWaterActive && fogInfo.m_nVisibleFogVolume == -1 )
-		return;
-
-	render->SetFogVolumeState( fogInfo.m_nVisibleFogVolume, bUseHeightFog );
+	{
+		IMaterial *pMaterial = FStopWaterFogMaterial( fogInfo.m_pFogVolumeMaterial, !bUseHeightFog );
+		IMaterialVar *pEnable = pMaterial ? pMaterial->FindVar( "$fogenable", NULL, false ) : NULL;
+		static ConVarRef waterFogEnabled( "fog_enable_water_fog" );
+		CMatRenderContextPtr pContext( materials );
+		if ( pEnable && pEnable->GetIntValue() && waterFogEnabled.GetBool() )
+		{
+			IMaterialVar *pColor = pMaterial->FindVar( "$fogcolor", NULL, false );
+			IMaterialVar *pStart = pMaterial->FindVar( "$fogstart", NULL, false );
+			IMaterialVar *pEnd = pMaterial->FindVar( "$fogend", NULL, false );
+			float color[3] = { 0, 0, 0 };
+			if ( pColor )
+				pColor->GetVecValue( color, 3 );
+			pContext->SetFogZ( fogInfo.m_flWaterHeight );
+			pContext->FogMode( bUseHeightFog ? MATERIAL_FOG_LINEAR_BELOW_FOG_Z : MATERIAL_FOG_LINEAR );
+			pContext->FogColor3fv( color );
+			pContext->FogStart( pStart ? pStart->GetFloatValue() : 0.0f );
+			pContext->FogEnd( pEnd ? pEnd->GetFloatValue() : 1000.0f );
+			pContext->FogMaxDensity( 1.0f );
+		}
+		else
+		{
+			pContext->FogMode( MATERIAL_FOG_NONE );
+		}
+	}
+	else
+	{
+		render->SetFogVolumeState( fogInfo.m_nVisibleFogVolume, bUseHeightFog );
+	}
 
 #ifdef PORTAL
 
@@ -6301,12 +6383,11 @@ void CAboveWaterView::CReflectionView::Draw()
 	bool bVisOcclusion = r_visocclusion.GetInt();
 	r_visocclusion.SetValue( 0 );
 
-	FStopHideAnalogWater( true );
+	CScopedFStopWaterTarget waterTarget;
 	DrawSetup( GetOuter()->m_fogInfo.m_flWaterHeight, m_DrawFlags, 0.0f, GetOuter()->m_fogInfo.m_nVisibleFogVolumeLeaf );
 
 	EnableWorldFog();
 	DrawExecute( GetOuter()->m_fogInfo.m_flWaterHeight, VIEW_REFLECTION, 0.0f );
-	FStopHideAnalogWater( false );
 
 	r_visocclusion.SetValue( bVisOcclusion );
 	
@@ -6336,6 +6417,11 @@ void CAboveWaterView::CRefractionView::Setup()
 	m_DrawFlags = DF_RENDER_REFRACTION | DF_CLIP_Z | 
 		DF_RENDER_UNDERWATER | DF_FUDGE_UP | 
 		DF_DRAW_ENTITITES ;
+
+	// Analog seas have no BSP water fog leaves. Keep dry leaves in the render
+	// lists and let the height clip plane select geometry below the surface.
+	if ( s_bFStopAnalogWaterActive )
+		m_DrawFlags |= DF_RENDER_ABOVEWATER;
 }
 
 
@@ -6344,6 +6430,7 @@ void CAboveWaterView::CRefractionView::Setup()
 //-----------------------------------------------------------------------------
 void CAboveWaterView::CRefractionView::Draw()
 {
+	CScopedFStopWaterTarget waterTarget;
 #ifdef PORTAL
 	g_pPortalRender->WaterRenderingHandler_PreRefraction();
 #endif
@@ -6409,17 +6496,18 @@ void CUnderWaterView::Setup( const CViewSetup &view, bool bDrawSkybox, const Vis
 
 	CalcWaterEyeAdjustments( fogInfo, m_waterHeight, m_waterZAdjust, m_bSoftwareUserClipPlane );
 
-	IMaterial *pWaterMaterial = fogInfo.m_pFogVolumeMaterial;
+	IMaterial *pWaterMaterial = FStopWaterFogMaterial( fogInfo.m_pFogVolumeMaterial, s_bFStopAnalogWaterActive );
 	if (engine->GetDXSupportLevel() >= 90 )					// screen voerlays underwater are a dx9 feature
 	{
 		IMaterialVar *pScreenOverlayVar = pWaterMaterial->FindVar( "$underwateroverlay", NULL, false );
 		if ( pScreenOverlayVar && ( pScreenOverlayVar->IsDefined() ) )
 		{
 			char const *pOverlayName = pScreenOverlayVar->GetStringValue();
-			if ( pOverlayName[0] != '0' )						// fixme!!!
+			if ( pOverlayName[0] && Q_stricmp( pOverlayName, "0" ) )
 			{
 				IMaterial *pOverlayMaterial = materials->FindMaterial( pOverlayName,  TEXTURE_GROUP_OTHER );
-				m_pMainView->SetWaterOverlayMaterial( pOverlayMaterial );
+				if ( pOverlayMaterial && !pOverlayMaterial->IsErrorMaterial() )
+					m_pMainView->SetWaterOverlayMaterial( pOverlayMaterial );
 			}
 		}
 	}
@@ -6442,6 +6530,11 @@ void CUnderWaterView::Setup( const CViewSetup &view, bool bDrawSkybox, const Vis
 	{
 		m_DrawFlags |= DF_RENDER_ABOVEWATER;
 	}
+
+	// Every world leaf is dry for a brush sea; height clipping separates the
+	// underwater scene instead of BSP water-leaf pruning.
+	if ( s_bFStopAnalogWaterActive )
+		m_DrawFlags |= DF_RENDER_ABOVEWATER | DF_CLIP_Z;
 
 	m_fogInfo = fogInfo;
 	m_waterInfo = waterInfo;
@@ -6518,6 +6611,7 @@ void CUnderWaterView::CRefractionView::Setup()
 //-----------------------------------------------------------------------------
 void CUnderWaterView::CRefractionView::Draw()
 {
+	CScopedFStopWaterTarget waterTarget;
 	CMatRenderContextPtr pRenderContext( materials );
 	SetFogVolumeState( GetOuter()->m_fogInfo, true );
 	unsigned char ucFogColor[3];

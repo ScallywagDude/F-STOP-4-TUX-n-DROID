@@ -39,7 +39,8 @@ void MainMenu::PaintBackground()
 void MainMenu::OnKeyCodePressed( KeyCode code )
 {
 	// Nothing to go back to from the front screen
-	if ( code == KEY_ESCAPE || code == KEY_XBUTTON_B )
+	KeyCode baseCode = GetBaseButtonCode( code );
+	if ( baseCode == KEY_ESCAPE || baseCode == KEY_XBUTTON_B || baseCode == STEAMCONTROLLER_B )
 		return;
 	BaseClass::OnKeyCodePressed( code );
 }

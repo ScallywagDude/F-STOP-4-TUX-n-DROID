@@ -91,5 +91,5 @@ picture('new_save_game', [52, 62, 72], [26, 32, 38]);
 // the same art is on screen in the source repository's data only, so nothing else needs the old files
 const java = 'launcher/src/com/fstop/game/MainActivity.java';
 const t = fs.readFileSync(java, 'latin1');
-fs.writeFileSync(java, t.replace(/DATA_VERSION = \d+/, 'DATA_VERSION = 18'), 'latin1');
+fs.writeFileSync(java, t.replace(/DATA_VERSION = (\d+)/, (m, n) => 'DATA_VERSION = ' + (Number(n) + 1)), 'latin1');
 console.log('logo_replace ok');

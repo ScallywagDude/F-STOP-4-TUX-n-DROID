@@ -188,16 +188,17 @@ namespace BaseModUI
 		void StartExitingProcess( bool bWarmRestart );
 
 		CBaseModFooterPanel *GetFooterPanel() { return m_FooterPanel; }
-		void SetLastActiveUserId( int ) {}
-		int GetLastActiveUserId() { return 0; }
+		void SetLastActiveUserId( int userId ) { m_nLastActiveUserId = userId; }
+		int GetLastActiveUserId() { return m_nLastActiveUserId; }
 
 		void OpenOptionsDialog( vgui::Panel *parent );
 		void OpenKeyBindingsDialog( vgui::Panel *parent );
 		void OnTileSetChanged() {}
 		void SafeNavigateTo( vgui::Panel *pExpectedFrom, vgui::Panel *pDesiredTo, bool bAllowStealFocus );
 		void ResetAttractDemoTimeout( bool = false ) {}
-		bool IsControllerActive() const { return false; }
-		void SetControllerActive( bool ) {}
+		bool IsControllerActive() const { return m_bControllerActive; }
+		void SetControllerActive( bool active ) { m_bControllerActive = active; }
+		void OnMenuKeyPressed( vgui::KeyCode code );
 		bool IsQuickplay() const { return false; }
 		bool IsTransitionEffectEnabled() { return false; }
 		CBaseModTransitionPanel *GetTransitionEffectPanel();
@@ -221,9 +222,12 @@ namespace BaseModUI
 		virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
 		virtual void OnThink();
 		virtual void OnCommand( const char *command );
+		virtual void OnSetFocus();
+		virtual void OnKeyCodePressed( vgui::KeyCode code );
 
 	private:
 		void LoadChapters();
+		void UpdateControllerKeyRepeat();
 
 		static CBaseModPanel *m_CFactoryBasePanel;
 		vgui::DHANDLE< CBaseModFrame > m_Frames[WT_WINDOW_COUNT];
@@ -231,6 +235,10 @@ namespace BaseModUI
 		bool m_bClosingAllWindows;
 		bool m_bWasVisible;
 		bool m_bHasInGameMenu;
+		bool m_bControllerActive;
+		int m_nLastActiveUserId;
+		vgui::KeyCode m_RepeatKey;
+		float m_flNextControllerRepeat;
 		vgui::HScheme m_UIScheme;
 		vgui::HFont m_hDefaultFont;
 		CBaseModFooterPanel *m_FooterPanel;

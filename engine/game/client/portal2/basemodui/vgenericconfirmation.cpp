@@ -91,6 +91,7 @@ void GenericConfirmation::OnCommand(const char *command)
 
 void GenericConfirmation::OnKeyCodePressed( KeyCode keycode )
 {
+	CBaseModPanel::GetSingleton().OnMenuKeyPressed( keycode );
 	int userId = GetJoystickForCode( keycode );
 	vgui::KeyCode code = GetBaseButtonCode( keycode );
 	BaseModUI::CBaseModPanel::GetSingleton().SetLastActiveUserId( userId );
@@ -98,6 +99,7 @@ void GenericConfirmation::OnKeyCodePressed( KeyCode keycode )
 	switch ( code )
 	{
 	case KEY_XBUTTON_A:
+	case STEAMCONTROLLER_A:
 		if ( m_OkButtonEnabled )
 		{
 			CBaseModPanel::GetSingleton().PlayUISound( UISOUND_ACCEPT );
@@ -114,6 +116,7 @@ void GenericConfirmation::OnKeyCodePressed( KeyCode keycode )
 		break;
 
 	case KEY_XBUTTON_B:
+	case STEAMCONTROLLER_B:
 		if ( m_CancelButtonEnabled )
 		{
 			CBaseModPanel::GetSingleton().PlayUISound( UISOUND_BACK );

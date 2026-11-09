@@ -78,7 +78,7 @@ public:
 
 	virtual void PlayerRoughLandingEffects( float fvol );
 
-	virtual void CategorizePosition( bool bStayOnGround = false );
+	virtual void TryTouchGround( const Vector& start, const Vector& end, const Vector& mins, const Vector& maxs, unsigned int fMask, int collisionGroup, trace_t& pm ) OVERRIDE;
 
 	// Traces the player bbox as it is swept from start to end
 	virtual void TracePlayerBBox( const Vector& start, const Vector& end, unsigned int fMask, int collisionGroup, trace_t& pm );
@@ -394,215 +394,24 @@ void CPortalGameMovement::PlayerRoughLandingEffects( float fvol )
 #endif
 }
 
-void TracePlayerBBoxForGround2( const Vector& start, const Vector& end, const Vector& minsSrc,
-							   const Vector& maxsSrc, IHandleEntity *player, unsigned int fMask,
-							   int collisionGroup, trace_t& pm )
+// The base movement implementation calls this hook for both the full ground
+// hull and its four fallback quadrants. The old CategorizePosition(bool)
+// overload did not override this engine's CategorizePosition(void), so walking
+// onto a floor portal still found the original, uncut world floor.
+void CPortalGameMovement::TryTouchGround( const Vector& start, const Vector& end, const Vector& mins, const Vector& maxs, unsigned int fMask, int collisionGroup, trace_t& pm )
 {
-
-	VPROF( "TracePlayerBBoxForGround" );
-
-	CPortal_Player *pPortalPlayer = dynamic_cast<CPortal_Player *>(player->GetRefEHandle().Get());
-	CProp_Portal *pPlayerPortal = pPortalPlayer->m_hPortalEnvironment;
-
-#ifndef CLIENT_DLL
-	if( pPlayerPortal && pPlayerPortal->m_PortalSimulator.IsReadyToSimulate() == false )
-		pPlayerPortal = NULL;
-#endif
-
 	Ray_t ray;
-	Vector mins, maxs;
-
-	float fraction = pm.fraction;
-	Vector endpos = pm.endpos;
-
-	// Check the -x, -y quadrant
-	mins = minsSrc;
-	maxs.Init( min( 0, maxsSrc.x ), min( 0, maxsSrc.y ), maxsSrc.z );
 	ray.Init( start, end, mins, maxs );
+	CPortal_Player *pPortalPlayer = GetPortalPlayer();
 
-	if( pPlayerPortal )
-		UTIL_Portal_TraceRay( pPlayerPortal, ray, fMask, player, collisionGroup, &pm );
-	else
-		UTIL_TraceRay( ray, fMask, player, collisionGroup, &pm );
-
-	if ( pm.m_pEnt && pm.plane.normal[2] >= 0.7)
-	{
-		pm.fraction = fraction;
-		pm.endpos = endpos;
-		return;
-	}
-
-	// Check the +x, +y quadrant
-	mins.Init( max( 0, minsSrc.x ), max( 0, minsSrc.y ), minsSrc.z );
-	maxs = maxsSrc;
-	ray.Init( start, end, mins, maxs );
-
-	if( pPlayerPortal )
-		UTIL_Portal_TraceRay( pPlayerPortal, ray, fMask, player, collisionGroup, &pm );
-	else
-		UTIL_TraceRay( ray, fMask, player, collisionGroup, &pm );
-
-	if ( pm.m_pEnt && pm.plane.normal[2] >= 0.7)
-	{
-		pm.fraction = fraction;
-		pm.endpos = endpos;
-		return;
-	}
-
-	// Check the -x, +y quadrant
-	mins.Init( minsSrc.x, max( 0, minsSrc.y ), minsSrc.z );
-	maxs.Init( min( 0, maxsSrc.x ), maxsSrc.y, maxsSrc.z );
-	ray.Init( start, end, mins, maxs );
-
-	if( pPlayerPortal )
-		UTIL_Portal_TraceRay( pPlayerPortal, ray, fMask, player, collisionGroup, &pm );
-	else
-		UTIL_TraceRay( ray, fMask, player, collisionGroup, &pm );
-
-	if ( pm.m_pEnt && pm.plane.normal[2] >= 0.7)
-	{
-		pm.fraction = fraction;
-		pm.endpos = endpos;
-		return;
-	}
-
-	// Check the +x, -y quadrant
-	mins.Init( max( 0, minsSrc.x ), minsSrc.y, minsSrc.z );
-	maxs.Init( maxsSrc.x, min( 0, maxsSrc.y ), maxsSrc.z );
-	ray.Init( start, end, mins, maxs );
-
-	if( pPlayerPortal )
-		UTIL_Portal_TraceRay( pPlayerPortal, ray, fMask, player, collisionGroup, &pm );
-	else
-		UTIL_TraceRay( ray, fMask, player, collisionGroup, &pm );
-
-	if ( pm.m_pEnt && pm.plane.normal[2] >= 0.7)
-	{
-		pm.fraction = fraction;
-		pm.endpos = endpos;
-		return;
-	}
-
-	pm.fraction = fraction;
-	pm.endpos = endpos;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : &input - 
-//-----------------------------------------------------------------------------
-void CPortalGameMovement::CategorizePosition( bool bStayOnGround /*= false*/ )
-{
-	Vector point;
-	trace_t pm;
-
-	// if the player hull point one unit down is solid, the player
-	// is on ground
-
-	// see if standing on something solid	
-
-	// Doing this before we move may introduce a potential latency in water detection, but
-	// doing it after can get us stuck on the bottom in water if the amount we move up
-	// is less than the 1 pixel 'threshold' we're about to snap to.	Also, we'll call
-	// this several times per frame, so we really need to avoid sticking to the bottom of
-	// water on each call, and the converse case will correct itself if called twice.
-	CheckWater();
-
-	// observers don't have a ground entity
-	if ( player->IsObserver() )
-		return;
-
-	point[0] = mv->GetAbsOrigin()[0];
-	point[1] = mv->GetAbsOrigin()[1];
-	point[2] = mv->GetAbsOrigin()[2] - 2;
-
-	Vector bumpOrigin;
-	bumpOrigin = mv->GetAbsOrigin();
-
-	// Shooting up really fast.  Definitely not on ground.
-	// On ladder moving up, so not on ground either
-	// NOTE: 145 is a jump.
-	if ( mv->m_vecVelocity[2] > 140 || 
-		( mv->m_vecVelocity[2] > 0.0f && player->GetMoveType() == MOVETYPE_LADDER ) )   
-	{
-		SetGroundEntity( NULL );
-	}
-	else
-	{
-		// Try and move down.
-		TracePlayerBBox( bumpOrigin, point, MASK_PLAYERSOLID, COLLISION_GROUP_PLAYER_MOVEMENT, pm );
-
-		// If we hit a steep plane, we are not on ground
-		if ( pm.plane.normal[2] < 0.7)
-		{
-			// Test four sub-boxes, to see if any of them would have found shallower slope we could
-			// actually stand on
-
-			TracePlayerBBoxForGround2( bumpOrigin, point, GetPlayerMins(), GetPlayerMaxs(), mv->m_nPlayerHandle.Get(), MASK_PLAYERSOLID, COLLISION_GROUP_PLAYER_MOVEMENT, pm );
-			if ( pm.plane.normal[2] < 0.7)
-			{
-
-				SetGroundEntity( NULL );	// too steep
-				// probably want to add a check for a +z velocity too!
-				if ( ( mv->m_vecVelocity.z > 0.0f ) && ( player->GetMoveType() != MOVETYPE_NOCLIP ) )
-				{
-					player->m_surfaceFriction = 0.25f;
-				}
-			}
-			else
-			{
-				SetGroundEntity( &pm );  // Otherwise, point to index of ent under us.
-			}
-		}
-		else
-		{
-			SetGroundEntity( &pm );  // Otherwise, point to index of ent under us.
-		}
-
-		// If we are on something...
-		if (player->GetGroundEntity() != NULL)
-		{
-			// Then we are not in water jump sequence
-			player->m_flWaterJumpTime = 0;
-
-			// If we could make the move, drop us down that 1 pixel
-			if ( player->GetWaterLevel() < WL_Waist && !pm.startsolid && !pm.allsolid )
-			{
-				// check distance we would like to move -- this is supposed to just keep up
-				// "on the ground" surface not stap us back to earth (i.e. on move origin to
-				// end position when the ground is within .5 units away) (2 units)
-				if( pm.fraction )
-					//				if( pm.fraction < 0.5)
-				{
-					mv->SetAbsOrigin( pm.endpos );
-				}
-			}
-		}
-
-#ifndef CLIENT_DLL
-
-		//Adrian: vehicle code handles for us.
-		if ( player->IsInAVehicle() == false )
-		{
-			// If our gamematerial has changed, tell any player surface triggers that are watching
-			IPhysicsSurfaceProps *physprops = MoveHelper()->GetSurfaceProps();
-			surfacedata_t *pSurfaceProp = physprops->GetSurfaceData( pm.surface.surfaceProps );
-			char cCurrGameMaterial = pSurfaceProp->game.material;
-			if ( !player->GetGroundEntity() )
-			{
-				cCurrGameMaterial = 0;
-			}
-
-			// Changed?
-			if ( player->m_chPreviousTextureType != cCurrGameMaterial )
-			{
-				CEnvPlayerSurfaceTrigger::SetPlayerSurface( player, cCurrGameMaterial );
-			}
-
-			player->m_chPreviousTextureType = cCurrGameMaterial;
-		}
+#ifdef CLIENT_DLL
+	CTraceFilterSimple traceFilter( pPortalPlayer, collisionGroup );
+#else
+	CTraceFilterSimple baseFilter( pPortalPlayer, collisionGroup );
+	CTraceFilterTranslateClones traceFilter( &baseFilter );
 #endif
-	}
+
+	UTIL_Portal_TraceRay_With( pPortalPlayer->m_hPortalEnvironment, ray, fMask, &traceFilter, &pm );
 }
 
 void CPortalGameMovement::Duck( void )

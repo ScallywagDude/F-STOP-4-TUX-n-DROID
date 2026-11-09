@@ -33,7 +33,8 @@ void InGameMainMenu::PaintBackground()
 
 void InGameMainMenu::OnKeyCodePressed( KeyCode code )
 {
-	if ( code == KEY_XBUTTON_B || code == KEY_ESCAPE )
+	KeyCode baseCode = GetBaseButtonCode( code );
+	if ( baseCode == KEY_XBUTTON_B || baseCode == KEY_XBUTTON_START || baseCode == STEAMCONTROLLER_B || baseCode == STEAMCONTROLLER_START || baseCode == KEY_ESCAPE )
 	{
 		engine->ClientCmd_Unrestricted( "gameui_hide\n" );
 		return;

@@ -28,6 +28,8 @@ inline float max( double a, int b ) { return ( (float)a > (float)b ) ? (float)a 
 // Collision groups used by the camera. They only ever collide with their own group.
 #define COLLISION_GROUP_PLACEMENT_SOLID ( LAST_SHARED_COLLISION_GROUP + 40 )
 #define COLLISION_GROUP_CAMERA_SOLID    ( LAST_SHARED_COLLISION_GROUP + 41 )
+// Tunnel fields block physical objects while allowing every player through.
+#define COLLISION_GROUP_PORTAL_TUNNEL_BLOCKER ( LAST_SHARED_COLLISION_GROUP + 42 )
 
 #ifdef CLIENT_DLL
 // Materials load on first use on this branch, so the registration blocks compile to nothing.

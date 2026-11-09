@@ -26,6 +26,16 @@
 
 #define PORTALRENDERABLE_FLATBASIC_MINPIXELVIS 0.0f
 
+static float PortalExitClipDistance( const Vector &forward, const Vector &origin )
+{
+#ifdef PORTAL2
+	// Portable doors sit only 0.2 units in front of transparent supports. The
+	// classic half-unit backward bias retains the glass inside the exit view.
+	return forward.Dot( origin ) + 0.01f;
+#else
+	return forward.Dot( origin ) - 0.5f;
+#endif
+}
 
 CLIENTEFFECT_REGISTER_BEGIN( PrecacheFlatBasicPortalDrawingMaterials )
 #if !defined( _X360 ) //XBox 360 is guaranteed to use stencil mode, and therefore doesn't need texture mode materials
@@ -477,7 +487,7 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToBackBuffer( CViewRender *pVi
 		fCustomClipPlane[0] = vRemotePortalForward.x;
 		fCustomClipPlane[1] = vRemotePortalForward.y;
 		fCustomClipPlane[2] = vRemotePortalForward.z;
-		fCustomClipPlane[3] = vRemotePortalForward.Dot( ptRemotePortalPosition - (vRemotePortalForward * 0.5f) ); //moving it back a smidge to eliminate visual artifacts for half-in objects
+		fCustomClipPlane[3] = PortalExitClipDistance( vRemotePortalForward, ptRemotePortalPosition );
 
 		pRenderContext->PushCustomClipPlane( fCustomClipPlane ); //this is technically the same plane within recursive views, but pushing it anyway in-case something else has been added to the stack
 	}
@@ -588,7 +598,7 @@ void CPortalRenderable_FlatBasic::RenderPortalViewToTexture( CViewRender *pViewR
 	fCustomClipPlane[0] = m_pLinkedPortal->m_vForward.x;
 	fCustomClipPlane[1] = m_pLinkedPortal->m_vForward.y;
 	fCustomClipPlane[2] = m_pLinkedPortal->m_vForward.z;
-	fCustomClipPlane[3] = m_pLinkedPortal->m_vForward.Dot( m_pLinkedPortal->m_ptOrigin - (m_pLinkedPortal->m_vForward * 0.5f) ); //moving it back a smidge to eliminate visual artifacts for half-in objects
+	fCustomClipPlane[3] = PortalExitClipDistance( m_pLinkedPortal->m_vForward, m_pLinkedPortal->m_ptOrigin );
 
 	pRenderContext->PushCustomClipPlane( fCustomClipPlane );
 
@@ -688,9 +698,10 @@ void CPortalRenderable_FlatBasic::DrawPostStencilFixes( void )
 	//replace the fog we overwrote
 	RenderFogQuad();
 
-	//replace depth
-	DrawSimplePortalMesh( g_pPortalRender->m_MaterialsAccess.m_WriteZ_Model, 0.0f );
-	DrawRenderFixMesh( g_pPortalRender->m_MaterialsAccess.m_WriteZ_Model, 0.0f );
+	// Restore the same front offset used by DrawStencilMask. Restoring depth on
+	// the supporting surface lets coplanar translucent glass draw over the portal.
+	DrawSimplePortalMesh( g_pPortalRender->m_MaterialsAccess.m_WriteZ_Model );
+	DrawRenderFixMesh( g_pPortalRender->m_MaterialsAccess.m_WriteZ_Model );
 }
 
 bool CPortalRenderable_FlatBasic::ShouldUpdateDepthDoublerTexture( const CViewSetup &viewSetup )

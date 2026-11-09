@@ -193,6 +193,7 @@ public:
 	void FingerPress( touch_event_t *ev );
 	void FingerMotion( touch_event_t *ev );
 	void GetTouchAccumulators( float *forward, float *side, float *yaw, float *pitch );
+	void ReleaseAllFingers();
 	void GetTouchDelta( float yaw, float pitch, float *dx, float *dy );
 	void EditEvent( touch_event_t *ev );
 	void EnableTouchEdit(bool enable);

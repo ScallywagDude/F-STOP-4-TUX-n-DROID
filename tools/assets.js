@@ -132,7 +132,8 @@ function scanVmt(p) {
     const tex = 'materials/' + v.replace(/\.vtf$/, '');
     if (index.has(tex + '.vtf') || pak[tex + '.vtf']) need(tex + '.vtf', p);
     if (index.has(tex + '.hdr.vtf')) need(tex + '.hdr.vtf', p);
-    if (/fallback|material$/.test(m[1].toLowerCase()) && (index.has(tex + '.vmt'))) need(tex + '.vmt', p);
+    if (m[1].toLowerCase() === '$underwateroverlay') needMat(v, p);
+    else if (/fallback|material$/.test(m[1].toLowerCase()) && (index.has(tex + '.vmt'))) need(tex + '.vmt', p);
   }
 }
 // ---------- whole-folder includes ----------

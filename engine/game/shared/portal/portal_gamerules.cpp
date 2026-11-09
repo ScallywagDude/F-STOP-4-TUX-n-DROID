@@ -1129,6 +1129,15 @@ bool CPortalGameRules::ShouldCollide( int collisionGroup0, int collisionGroup1 )
 		return collisionGroup0 == collisionGroup1;
 	}
 
+#ifdef PORTAL2
+	// Map-start tunnel fields can spawn before a local player exists. Use an
+	// explicit group rather than an owner pointer to keep player paths clear.
+	const int nTunnelOtherGroup = collisionGroup0 == COLLISION_GROUP_PORTAL_TUNNEL_BLOCKER ? collisionGroup1 :
+		( collisionGroup1 == COLLISION_GROUP_PORTAL_TUNNEL_BLOCKER ? collisionGroup0 : -1 );
+	if ( nTunnelOtherGroup == COLLISION_GROUP_PLAYER || nTunnelOtherGroup == COLLISION_GROUP_PLAYER_MOVEMENT )
+		return false;
+#endif
+
 	// If it's a portal, we want to collide with it!
 	/*if ( collisionGroup0 == PORTALCOLLISION_GROUP_PORTAL && collisionGroup1 != PORTALCOLLISION_GROUP_PORTAL || 
 		 collisionGroup1 == PORTALCOLLISION_GROUP_PORTAL && collisionGroup0 != PORTALCOLLISION_GROUP_PORTAL )

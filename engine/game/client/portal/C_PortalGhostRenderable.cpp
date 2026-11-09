@@ -98,11 +98,20 @@ bool C_PortalGhostRenderable::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMax
 		pParent->SetModelIndex( pParent->GetWorldModelIndex() );
 	}
 
-	if( m_pGhostedRenderable->SetupBones( pBoneToWorldOut, nMaxBones, boneMask, currentTime ) )
+	bool bBonesReady = m_pGhostedRenderable->SetupBones( pBoneToWorldOut, nMaxBones, boneMask, currentTime );
+	int nBones = nMaxBones;
+	C_BaseAnimating *pAnimating = dynamic_cast<C_BaseAnimating *>( m_pGhostedRenderable );
+	CStudioHdr *pStudioHdr = pAnimating ? pAnimating->GetModelPtr() : NULL;
+	if ( pStudioHdr )
+		nBones = MIN( nBones, pStudioHdr->numbones() );
+	if ( pParent )
+		pParent->SetModelIndex( nModelIndex );
+
+	if( bBonesReady )
 	{
 		if( pBoneToWorldOut )
 		{
-			for( int i = 0; i != nMaxBones; ++i ) //FIXME: nMaxBones is most definitely greater than the actual number of bone transforms actually used, find the subset somehow
+			for( int i = 0; i < nBones; ++i )
 			{
 				pBoneToWorldOut[i] = (m_matGhostTransform * pBoneToWorldOut[i]).As3x4();
 			}
@@ -110,11 +119,6 @@ bool C_PortalGhostRenderable::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMax
 		return true;
 	}
 	
-	if ( pParent )
-	{
-		pParent->SetModelIndex( nModelIndex );
-	}
-
 	return false;
 }
 
@@ -237,6 +241,16 @@ bool C_PortalGhostRenderable::GetAttachmentVelocity( int number, Vector &originV
 
 int C_PortalGhostRenderable::DrawModel( int flags )
 {
+	if ( !m_pGhostedRenderable )
+		return 0;
+
+#ifdef ANDROID
+	// Match C_Portal_Player::DrawModel: the phone build hides the local body.
+	// Ghosts render through C_BaseAnimating and otherwise bypass that rule.
+	if ( m_bLocalPlayer && m_pGhostedRenderable->IsPlayer() )
+		return 0;
+#endif
+
 	if( m_bSourceIsBaseAnimating )
 	{
 		if( m_bLocalPlayer )

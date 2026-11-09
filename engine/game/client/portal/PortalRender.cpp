@@ -163,7 +163,7 @@ CPortalRenderable::~CPortalRenderable( void )
 
 void CPortalRenderable::BeginPortalPixelVisibilityQuery( void )
 {
-#ifndef TEMP_DISABLE_PORTAL_VIS_QUERY
+#ifdef TEMP_DISABLE_PORTAL_VIS_QUERY
 	return;
 #endif
 
@@ -186,7 +186,7 @@ void CPortalRenderable::BeginPortalPixelVisibilityQuery( void )
 
 void CPortalRenderable::EndPortalPixelVisibilityQuery( void )
 {
-#ifndef TEMP_DISABLE_PORTAL_VIS_QUERY
+#ifdef TEMP_DISABLE_PORTAL_VIS_QUERY
 	return;
 #endif
 
@@ -348,7 +348,7 @@ void Recursive_UpdatePortalPixelVisibility( PortalViewIDNode_t *pNode, IMatRende
 
 void CPortalRender::UpdatePortalPixelVisibility( void )
 {
-#ifndef TEMP_DISABLE_PORTAL_VIS_QUERY
+#ifdef TEMP_DISABLE_PORTAL_VIS_QUERY
 	return;
 #endif
 

@@ -9,6 +9,7 @@
 #include "ai_utils.h"
 #include "particle_system.h"
 #include "entityblocker.h"
+#include "physics_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -22,6 +23,16 @@ const char* g_pszCreateTunnelContext = "CreateTunnelThinkContext";
 
 ConVar sv_portal_door_use_legacy_placement_rules ( "sv_portal_door_use_legacy_placement_rules", "0" );
 ConVar sv_portal_door_allowscale ( "sv_portal_door_allowscale", "0" );
+
+// The scalable fizzler reads CP1.x as data, rather than as a world position.
+// Its point must reach the client even when that data lies outside the map PVS.
+class CPortalTunnelParticleScale : public CPointEntity
+{
+public:
+	DECLARE_CLASS( CPortalTunnelParticleScale, CPointEntity );
+	int UpdateTransmitState() { return SetTransmitState( FL_EDICT_ALWAYS ); }
+};
+LINK_ENTITY_TO_CLASS( portal_tunnel_particle_scale, CPortalTunnelParticleScale );
 
 
 
@@ -73,6 +84,7 @@ public:
 private:
 
 	void CreateParticleField( void );
+	void CreatePhysicsBlocker( void );
 	bool PositionIsValid( const Vector &vecPosition, const QAngle &vecAngles, Vector *vecResultPosition, QAngle *vecResultAngles );
 	bool FindPortalPoint( const char *lpszCandidateName, Vector *vecOriginOut, QAngle *vecAnglesOut );
 	void CreateTunnel( void );
@@ -93,6 +105,7 @@ private:
 	string_t					m_strSuccessTarget;			// Success target (if specified, does this instead of tunneling)
 	CHandle<CPropPortalTunnel>	m_hPartner;					// The other side of the door (we're always linked to it!
 	CHandle<CParticleSystem>	m_hParticleField;			// Particle effect
+	EHANDLE					m_hParticleScale;			// CP1 data for the scalable effect
 	CHandle<CEntityBlocker>		m_hPhysicsBlocker;			// Blocker for objects passing through
 
 	const string_t& GetFailTargetString( void ) const;
@@ -112,6 +125,9 @@ BEGIN_DATADESC( CPropPortalTunnel )
 	DEFINE_FIELD( m_nPortalGroupID, FIELD_INTEGER ),
 	DEFINE_FIELD( m_hPortal, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_hPartner, FIELD_EHANDLE ),
+	DEFINE_FIELD( m_hParticleField, FIELD_EHANDLE ),
+	DEFINE_FIELD( m_hParticleScale, FIELD_EHANDLE ),
+	DEFINE_FIELD( m_hPhysicsBlocker, FIELD_EHANDLE ),
 
 END_DATADESC()
 
@@ -149,6 +165,12 @@ void CPropPortalTunnel::Destroy( void )
 	{
 		UTIL_Remove( m_hPhysicsBlocker );
 		m_hPhysicsBlocker = NULL;
+	}
+
+	if ( m_hParticleScale )
+	{
+		UTIL_Remove( m_hParticleScale );
+		m_hParticleScale = NULL;
 	}
 }
 
@@ -214,6 +236,11 @@ void CPropPortalTunnel::CreateParticleField( void )
 		UTIL_Remove( m_hParticleField );
 		m_hParticleField = NULL;
 	}
+	if ( m_hParticleScale )
+	{
+		UTIL_Remove( m_hParticleScale );
+		m_hParticleScale = NULL;
+	}
 
 	m_hParticleField = (CParticleSystem *) CreateEntityByName( "info_particle_system" );
 	if ( m_hParticleField == NULL )
@@ -229,14 +256,49 @@ void CPropPortalTunnel::CreateParticleField( void )
 	m_hParticleField->SetAbsOrigin( GetAbsOrigin() + ( vecForward * 1.1f ) );
 	
 	m_hParticleField->SetAbsAngles( GetAbsAngles() );
+	m_hParticleField->SetParent( this );
+
+	// fizzler_field_scalable uses CP1.x for radius, lifetime and trail length.
+	// An unset control point supplies zero and makes the field invisible.
+	m_hParticleScale = CreateEntityByName( "portal_tunnel_particle_scale" );
+	if ( m_hParticleScale )
+	{
+		m_hParticleScale->SetAbsOrigin( Vector( GetModelScale(), 0.0f, 0.0f ) );
+		DispatchSpawn( m_hParticleScale );
+		m_hParticleField->SetControlPointEntity( 1, m_hParticleScale );
+	}
 	DispatchSpawn( m_hParticleField );
-	if ( gpGlobals->curtime > 0.5f )
-		m_hParticleField->Activate();
+	m_hParticleField->Activate();
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+
+void CPropPortalTunnel::CreatePhysicsBlocker()
+{
+	if ( m_hPhysicsBlocker )
+	{
+		UTIL_Remove( m_hPhysicsBlocker );
+		m_hPhysicsBlocker = NULL;
+	}
+
+	// Use the frame's local bounds. A world AABB fills a large invisible box
+	// around diagonal, floor and ceiling doors instead of following the opening.
+	Vector vecMins = CollisionProp()->OBBMins() * 0.9f;
+	Vector vecMaxs = CollisionProp()->OBBMaxs() * 0.9f;
+	m_hPhysicsBlocker = CEntityBlocker::Create( GetAbsOrigin(), vecMins, vecMaxs, UTIL_GetLocalPlayer(), false );
+	if ( m_hPhysicsBlocker )
+	{
+		// The initial map spawn can precede player creation. Owner filtering is
+		// insufficient there, and this field must only stop physical objects.
+		m_hPhysicsBlocker->SetCollisionGroup( COLLISION_GROUP_PORTAL_TUNNEL_BLOCKER );
+		m_hPhysicsBlocker->SetSolid( SOLID_OBB );
+		m_hPhysicsBlocker->SetAbsAngles( GetAbsAngles() );
+		m_hPhysicsBlocker->VPhysicsSetObject( PhysModelCreateOBB( m_hPhysicsBlocker, vecMins, vecMaxs, GetAbsOrigin(), GetAbsAngles(), true ) );
+	}
+}
+
 void CPropPortalTunnel::Spawn( void )
 {
 	Precache();
@@ -302,24 +364,12 @@ void CPropPortalTunnel::Spawn( void )
 	CreateParticleField();
 
 	SetMoveType( MOVETYPE_NONE );
-	SetSolid( SOLID_OBB_YAW );
+	SetSolid( SOLID_OBB );
 	SetCollisionGroup( COLLISION_GROUP_CAMERA_SOLID );
 
 	SetModel( PORTAL_TUNNEL_MODEL_NAME );
 
-	// Create a blocker internally
-	Vector vecMins, vecMaxs;
-	QAngle vecOldAngles = GetAbsAngles();
-
-	CollisionProp()->WorldSpaceAABB( &vecMins, &vecMaxs );
-	vecMins -= GetAbsOrigin();
-	vecMaxs -= GetAbsOrigin();
-	vecMins[0] *= 0.9f;
-	vecMins[1] *= 0.9f;
-	vecMaxs *= 0.9f;
-
-	// Create an entity blocker
-	m_hPhysicsBlocker = CEntityBlocker::Create( GetAbsOrigin(), vecMins, vecMaxs, UTIL_GetLocalPlayer(), true );
+	CreatePhysicsBlocker();
 
 	// Don't cast shadows because we're going to be moving around
 	AddEffects( EF_NOSHADOW );
@@ -562,6 +612,8 @@ void CPropPortalTunnel::OnCaptured( void )
 //-----------------------------------------------------------------------------
 void CPropPortalTunnel::OnReleased( void )
 {
+	CreateParticleField();
+	CreatePhysicsBlocker();
 	CreateTunnel();
 
 	BaseClass::OnReleased();

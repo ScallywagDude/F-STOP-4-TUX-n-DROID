@@ -68,6 +68,9 @@ public class ValveActivity2 {
 		setenv("APP_DATA_PATH", new File(gamepath).getParent(), 1);
 		setenv("APP_LIB_PATH", appinf.nativeLibraryDir, 1);
 		setenv("VALVE_GAME_PATH", gamepath, 1);
+		if ((appinf.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+			setenv("FSTOP_TEST_COMMAND_PATH", new File(context.getFilesDir(), "fstop_cmd.txt").getAbsolutePath(), 1);
+		}
 
 		// The on-screen controls only ever appear on devices that have a touchscreen.
 		boolean touch = context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN);

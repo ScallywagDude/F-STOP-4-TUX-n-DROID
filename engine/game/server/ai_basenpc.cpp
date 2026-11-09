@@ -6690,12 +6690,11 @@ void CAI_BaseNPC::SetHullSizeNormal( bool force )
 {
 	if ( m_fIsUsingSmallHull || force )
 	{
-		// Find out what the height difference will be between the versions and adjust our bbox accordingly to keep us level
-		const float flScale = GetModelScale();
-		Vector vecMins = ( GetHullMins() * flScale );
-		Vector vecMaxs = ( GetHullMaxs() * flScale );
-		
-		UTIL_SetSize( this, vecMins, vecMaxs );
+		// Pass the unscaled hull. CCollisionProperty::SetCollisionBounds stores it as
+		// the pre-scaled size and applies GetModelScale() itself, the same way
+		// SetHullSizeSmall works. Multiplying here as well scaled photo-resized NPCs
+		// twice: a 4x chicken got a 16x box and could never get close enough to peck.
+		UTIL_SetSize( this, GetHullMins(), GetHullMaxs() );
 
 		m_fIsUsingSmallHull = false;
 		if ( VPhysicsGetObject() )

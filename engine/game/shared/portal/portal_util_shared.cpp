@@ -77,13 +77,18 @@ public:
 
 void CTransformedCollideable::WorldSpaceTriggerBounds( Vector *pVecWorldMins, Vector *pVecWorldMaxs ) const
 {
-	m_pWrappedCollideable->WorldSpaceTriggerBounds( pVecWorldMins, pVecWorldMaxs );
-	
-	if( pVecWorldMins )
-		*pVecWorldMins = m_matTransform * (*pVecWorldMins);
+	if ( !pVecWorldMins && !pVecWorldMaxs )
+		return;
 
-	if( pVecWorldMaxs )
-		*pVecWorldMaxs = m_matTransform * (*pVecWorldMaxs);
+	Vector vMins, vMaxs;
+	m_pWrappedCollideable->WorldSpaceTriggerBounds( &vMins, &vMaxs );
+	// Rotating two opposite corners does not rotate an AABB: a quarter/half
+	// turn can reverse its axes. Include all corners, as for surrounding bounds.
+	TransformAABB( m_matTransform.As3x4(), vMins, vMaxs, vMins, vMaxs );
+	if ( pVecWorldMins )
+		*pVecWorldMins = vMins;
+	if ( pVecWorldMaxs )
+		*pVecWorldMaxs = vMaxs;
 }
 
 bool CTransformedCollideable::TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr )

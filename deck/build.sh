@@ -1,22 +1,21 @@
-#!/bin/bash
-# Runs inside WSL (Steam Runtime sniper). Copies the engine source in and builds x86-64 Linux F-STOP.
-# usage: build.sh
+#!/usr/bin/env bash
+# Run inside Linux or the Steam Runtime sniper SDK.
+# Usage: build.sh [release|debug] [additional waf configure options]
+set -euo pipefail
 MODE=${1:-release}
-SRC="$(cd "$(dirname "$0")/.." && pwd)/engine"
-W=/root/engine
-mkdir -p $W
-cd $SRC
-tar c --exclude=./build --exclude=./.git --exclude='*.o' --exclude=./dx9sdk --exclude=./hammer . | tar x -C $W --keep-newer-files 2>/dev/null
-cd $W
-# Source files keep CRLF from Windows, waf itself must not
-sed -i 's/\r$//' waf 2>/dev/null; chmod +x waf
-EXTRA=""
-if [ ! -f /root/configured_$MODE ]; then
-  CFLAGS="$EXTRA" CXXFLAGS="$EXTRA" python3 waf configure -T release --build-games=portal --disable-warns --prefix=/root/install_$MODE > /root/configure_$MODE.log 2>&1
-  rc=$?; tail -5 /root/configure_$MODE.log
-  [ $rc = 0 ] || { echo CONFIGURE FAILED; exit 1; }
-  touch /root/configured_$MODE
-fi
-python3 waf build -j12 -k > /root/build_$MODE.log 2>&1
-echo "build exit $?"
-grep -E 'error:|fatal error|Build failed|finished successfully' /root/build_$MODE.log | sed 's/^.*\/root\/engine\///' | sort | uniq -c | sort -rn | head -40 | cut -c1-170
+if (( $# )); then shift; fi
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SRC="${FSTOP_SOURCE_DIR:-$REPO/engine}"
+BUILD="${FSTOP_BUILD_DIR:-$REPO/.port-build/linux-x86_64}"
+INSTALL="${FSTOP_INSTALL_DIR:-$REPO/.port-build/linux-install}"
+LOGS="${FSTOP_LOG_DIR:-$REPO/.port-build/linux-logs}"
+mkdir -p "$BUILD" "$INSTALL" "$LOGS"
+cd "$SRC"
+# Always let waf check the current configuration and dependencies. A separate
+# output directory keeps Linux and Android builds independent.
+python3 waf configure --out="$BUILD" -T "$MODE" --build-games=portal \
+    --use-sdl=1 --use-togl=1 --disable-warns --prefix="$INSTALL" "$@" \
+    2>&1 | tee "$LOGS/configure.log"
+python3 waf build --out="$BUILD" -j"${FSTOP_JOBS:-12}" -k \
+    2>&1 | tee "$LOGS/build.log"
+printf 'Build complete: %s\nInstall prefix: %s\n' "$BUILD" "$INSTALL"

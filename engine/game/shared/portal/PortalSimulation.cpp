@@ -226,13 +226,31 @@ void CPortalSimulator::MoveTo( const Vector &ptCenter, const QAngle &angles )
 }
 
 
+// Release fast-math compilers fold ordinary IsFinite checks to true. Portal
+// resize runs before placement during restore, when ptCenter is a NaN sentinel.
+// A volatile integer read preserves the representation check at this boundary.
+static bool PortalSimulatorHasFinitePlacement( const Vector &center, const QAngle &angles, float halfWidth, float halfHeight )
+{
+	const float values[] = { center.x, center.y, center.z, angles.x, angles.y, angles.z, halfWidth, halfHeight };
+	for ( int i = 0; i < 8; ++i )
+	{
+		volatile unsigned int bits = FloatBits( values[i] );
+		if ( ( bits & 0x7F800000u ) == 0x7F800000u )
+			return false;
+	}
+	return true;
+}
+
 void CPortalSimulator::MovedOrResized( const Vector &ptCenter, const QAngle &qAngles, float fHalfWidth, float fHalfHeight )
 {
-	if( (fHalfWidth == 0.0f) || (fHalfHeight == 0.0f) || !ptCenter.IsValid() )
+	if( (fHalfWidth <= 0.0f) || (fHalfHeight <= 0.0f) || !PortalSimulatorHasFinitePlacement( ptCenter, qAngles, fHalfWidth, fHalfHeight ) )
 	{
-		m_InternalData.Placement.fHalfWidth = fHalfWidth;
-		m_InternalData.Placement.fHalfHeight = fHalfHeight;
-
+		if ( PortalSimulatorHasFinitePlacement( vec3_origin, vec3_angle, fHalfWidth, fHalfHeight ) )
+		{
+			m_InternalData.Placement.fHalfWidth = fHalfWidth;
+			m_InternalData.Placement.fHalfHeight = fHalfHeight;
+		}
+		m_bLocalDataIsReady = false;
 		ClearEverything();
 		return;
 	}
@@ -1244,7 +1262,7 @@ void CPortalSimulator::CreateLocalPhysics( void )
 	if( m_InternalData.Simulation.pCollisionEntity )
 		params.pGameData = m_InternalData.Simulation.pCollisionEntity;
 	else
-		GetWorldEntity();
+		params.pGameData = GetWorldEntity();
 
 	//World
 	{
@@ -1302,7 +1320,7 @@ void CPortalSimulator::CreateLocalPhysics( void )
 			m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject = m_InternalData.Simulation.pPhysicsEnvironment->CreatePolyObjectStatic( m_InternalData.Simulation.Static.Wall.Local.Brushes.pCollideable, m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps, vec3_origin, vec3_angle, &params );
 			
 			if( (m_InternalData.Simulation.pCollisionEntity != NULL) && (m_InternalData.Simulation.pCollisionEntity->VPhysicsGetObject() == NULL) )
-				m_InternalData.Simulation.pCollisionEntity->VPhysicsSetObject(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject);
+				m_InternalData.Simulation.pCollisionEntity->VPhysicsSetObject(m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject);
 
 			m_InternalData.Simulation.Static.Wall.Local.Brushes.pPhysicsObject->RecheckCollisionFilter(); //some filters only work after the variable is stored in the class
 		}
@@ -1313,7 +1331,7 @@ void CPortalSimulator::CreateLocalPhysics( void )
 			m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject = m_InternalData.Simulation.pPhysicsEnvironment->CreatePolyObjectStatic( m_InternalData.Simulation.Static.Wall.Local.Tube.pCollideable, m_InternalData.Simulation.Static.SurfaceProperties.surface.surfaceProps, vec3_origin, vec3_angle, &params );
 			
 			if( (m_InternalData.Simulation.pCollisionEntity != NULL) && (m_InternalData.Simulation.pCollisionEntity->VPhysicsGetObject() == NULL) )
-				m_InternalData.Simulation.pCollisionEntity->VPhysicsSetObject(m_InternalData.Simulation.Static.World.Brushes.pPhysicsObject);
+				m_InternalData.Simulation.pCollisionEntity->VPhysicsSetObject(m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject);
 
 			m_InternalData.Simulation.Static.Wall.Local.Tube.pPhysicsObject->RecheckCollisionFilter(); //some filters only work after the variable is stored in the class
 		}
@@ -2993,7 +3011,7 @@ IPhysicsObject *CPSCollisionEntity::VPhysicsGetObject( void )
 	else if( m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject != NULL )
 		return m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject;
 	else if( m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.Local.Tube.pPhysicsObject != NULL )
-		return m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.Local.Brushes.pPhysicsObject;
+		return m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.Local.Tube.pPhysicsObject;
 	else if( m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject != NULL )
 		return m_pOwningSimulator->m_DataAccess.Simulation.Static.Wall.RemoteTransformedToLocal.Brushes.pPhysicsObject;
 	else
