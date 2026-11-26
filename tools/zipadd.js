@@ -1,4 +1,5 @@
-// Appends files to an APK. Large assets and native libraries go in uncompressed; dex is deflated.
+// Appends files to an APK. Native libraries go in uncompressed (Android maps them from the APK); everything else is
+// deflated when that saves space, so the 4 GB-plus game data still fits the 32-bit zip format.
 // usage: node zipadd.js <apk> <stage-dir> [asset-root]   (asset-root's contents land under assets/)
 // Rewrites the zip central directory; stays within plain 32-bit zip limits, as Android requires.
 const fs = require('fs'), path = require('path'), zlib = require('zlib');
@@ -13,7 +14,7 @@ let e = src.length - 22; while (src.readUInt32LE(e) !== 0x06054b50) e--;
 const count = src.readUInt16LE(e + 10); let p = src.readUInt32LE(e + 16);
 const fd = fs.openSync(apk + '.tmp', 'w');
 let off = 0; const cd = [];
-const write = b => { fs.writeSync(fd, b); off += b.length; };
+const write = b => { fs.writeSync(fd, b); off += b.length; if (off > 0xffffffff) throw new Error('APK passed the 4 GB limit of a 32-bit zip'); };
 function header(name, method, crc, csize, size) {
   const n = Buffer.from(name), h = Buffer.alloc(30);
   h.writeUInt32LE(0x04034b50, 0); h.writeUInt16LE(20, 4); h.writeUInt16LE(0x0800, 6); h.writeUInt16LE(method, 8);
@@ -38,12 +39,13 @@ function addFile(name, file, store) {
     header(name, 0, crc, size, size);
     const g = fs.openSync(file, 'r'); while ((n = fs.readSync(g, buf, 0, buf.length)) > 0) write(buf.subarray(0, n)); fs.closeSync(g);
   } else {
-    const data = fs.readFileSync(file), crc = (crcUpdate(-1, data) ^ -1) >>> 0, z = zlib.deflateRawSync(data, { level: 9 });
-    header(name, 8, crc, z.length, data.length); write(z);
+    const data = fs.readFileSync(file), crc = (crcUpdate(-1, data) ^ -1) >>> 0, z = zlib.deflateRawSync(data, { level: 6 });
+    if (z.length < data.length) { header(name, 8, crc, z.length, data.length); write(z); }
+    else { header(name, 0, crc, data.length, data.length); write(data); }
   }
 }
 for (const f of walk(stage)) { const rel = path.relative(stage, f).split(path.sep).join('/'); addFile(rel, f, rel.startsWith('lib/')); }
-if (assetRoot) for (const f of walk(assetRoot)) addFile('assets/' + path.relative(assetRoot, f).split(path.sep).join('/'), f, true);
+if (assetRoot) for (const f of walk(assetRoot)) addFile('assets/' + path.relative(assetRoot, f).split(path.sep).join('/'), f, false);
 const cdStart = off;
 for (const c of cd) {
   const h = Buffer.alloc(46);

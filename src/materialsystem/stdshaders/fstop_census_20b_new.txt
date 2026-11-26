@@ -1,0 +1,3 @@
+// shaders F-STOP maps load (engine -shadercensus); built with COMBOLIST
+luminance_compare_ps2x.fxc
+water_ps2x.fxc

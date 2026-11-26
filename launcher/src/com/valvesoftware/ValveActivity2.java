@@ -33,8 +33,14 @@ public class ValveActivity2 {
 		}
 	}
 
+	// 1.2 (the CS:GO engine) keeps its game files apart from the 1.1 ones, so none of the older loose files can
+	// override the new data; nothing of 1.1 is touched.
+	public static File gameRoot(Context context) {
+		return new File(context.getExternalFilesDir(null), "go");
+	}
+
 	private static String gamePath(Context context) {
-		return context.getExternalFilesDir(null).getAbsolutePath();
+		return gameRoot(context).getAbsolutePath();
 	}
 
 	static public boolean preInit(Context context, Intent intent) {
@@ -65,12 +71,10 @@ public class ValveActivity2 {
 		copyFonts(context);
 
 		setenv("LANG", Locale.getDefault().toString(), 1);
-		setenv("APP_DATA_PATH", new File(gamepath).getParent(), 1);
+		// fonts are copied to <APP_DATA_PATH>/files (copyFonts)
+		setenv("APP_DATA_PATH", context.getExternalFilesDir(null).getParent(), 1);
 		setenv("APP_LIB_PATH", appinf.nativeLibraryDir, 1);
 		setenv("VALVE_GAME_PATH", gamepath, 1);
-		if ((appinf.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
-			setenv("FSTOP_TEST_COMMAND_PATH", new File(context.getFilesDir(), "fstop_cmd.txt").getAbsolutePath(), 1);
-		}
 
 		// The on-screen controls only ever appear on devices that have a touchscreen.
 		boolean touch = context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN);

@@ -1,0 +1,39 @@
+default:  fxctmp9_tmp\spritecard_vs20.inc shaders\fxc\spritecard_vs20.vcs fxctmp9_tmp\spritecard_ps20.inc shaders\fxc\spritecard_ps20.vcs fxctmp9_tmp\spritecard_ps20b.inc shaders\fxc\spritecard_ps20b.vcs fxctmp9_tmp\splinecard_vs20.inc shaders\fxc\splinecard_vs20.vcs
+
+fxctmp9_tmp\spritecard_vs20.inc shaders\fxc\spritecard_vs20.vcs: spritecard_vsxx.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_vs_fxc.h common_hlsl_cpp_consts.h common_spritecard_fxc.h common_pragmas.h common_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" spritecard_vsxx.fxc-----spritecard_vs20
+	echo spritecard_vsxx.fxc>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_spritecard_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\spritecard_ps20.inc shaders\fxc\spritecard_ps20.vcs: spritecard_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_pragmas.h common_fxc.h common_spritecard_fxc.h common_hlsl_cpp_consts.h common_ps_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" spritecard_ps2x.fxc-----spritecard_ps20
+	echo spritecard_ps2x.fxc>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_spritecard_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\spritecard_ps20b.inc shaders\fxc\spritecard_ps20b.vcs: spritecard_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_pragmas.h common_fxc.h common_spritecard_fxc.h common_hlsl_cpp_consts.h common_ps_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" spritecard_ps2x.fxc-----spritecard_ps20b
+	echo spritecard_ps2x.fxc>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_spritecard_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\splinecard_vs20.inc shaders\fxc\splinecard_vs20.vcs: splinecard_vsxx.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_spritecard_fxc.h spline_fxc.h common_hlsl_cpp_consts.h common_vs_fxc.h common_fxc.h common_pragmas.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" splinecard_vsxx.fxc-----splinecard_vs20
+	echo splinecard_vsxx.fxc>> filestocopy.txt
+	echo common_spritecard_fxc.h>> filestocopy.txt
+	echo spline_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+

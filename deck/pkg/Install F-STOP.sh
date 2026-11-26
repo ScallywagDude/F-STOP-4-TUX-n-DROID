@@ -1,7 +1,7 @@
 #!/bin/bash
 # Adds F-STOP to the Steam library. Run it in Desktop Mode, with Steam open.
 HERE="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
-chmod +x "$HERE/F-STOP" "$HERE/hl2_launcher"
+chmod +x "$HERE/F-STOP" "$HERE/fstop_linux64"
 
 say() {
   if command -v kdialog >/dev/null 2>&1; then kdialog --title "F-STOP" --msgbox "$1"

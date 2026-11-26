@@ -1,0 +1,40 @@
+// Camera focus from native scene depth; works with integer and float HDR.
+sampler Scene : register(s0);
+sampler Depth : register(s1);
+float4 Focus : register(c0); // near blur, near focus, far focus, far blur
+float4 Radius : register(c1); // inverse framebuffer size, near/far radius
+float4 Planes : register(c2); // projection near/far
+
+float ViewDepth(float2 uv)
+{
+    float z = tex2D(Depth, uv).r;
+    return Planes.x * Planes.y / max(Planes.y - z * (Planes.y - Planes.x), 0.0001);
+}
+float BlurRadius(float depth)
+{
+    float nearBlur = saturate((Focus.y-depth) / max(Focus.y-Focus.x, 1.0));
+    float farBlur = saturate((depth-Focus.z) / max(Focus.w-Focus.z, 1.0));
+    return max(nearBlur * Radius.z, farBlur * Radius.w);
+}
+float4 main(float2 uv : TEXCOORD0) : COLOR
+{
+    float depth = ViewDepth(uv);
+    float radius = BlurRadius(depth);
+    float4 center = tex2D(Scene, uv);
+    float3 color = center.rgb;
+    float weight = 1.0;
+    const float2 taps[8] = {
+        float2(-.326,-.406), float2(-.840,-.074), float2(-.696,.457), float2(-.203,.621),
+        float2(.962,-.195), float2(.473,-.480), float2(.519,.767), float2(.185,-.893)
+    };
+    for (int i=0; i<8; ++i)
+    {
+        float2 sampleUV = uv + taps[i] * Radius.xy * radius;
+        float sampleDepth = ViewDepth(sampleUV);
+        // A sharp foreground silhouette must not bleed over blurred distance.
+        float w = saturate(BlurRadius(sampleDepth) + (sampleDepth >= depth ? 1.0 : 0.0));
+        color += tex2D(Scene, sampleUV).rgb * w;
+        weight += w;
+    }
+    return float4(color / weight, center.a);
+}

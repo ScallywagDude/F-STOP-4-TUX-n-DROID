@@ -1,0 +1,6 @@
+default:  fxctmp9_tmp\fstop_camera_dof_ps20b.inc shaders\fxc\fstop_camera_dof_ps20b.vcs
+
+fxctmp9_tmp\fstop_camera_dof_ps20b.inc shaders\fxc\fstop_camera_dof_ps20b.vcs: fstop_camera_dof_ps20b.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl 
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" fstop_camera_dof_ps20b.fxc-----fstop_camera_dof_ps20b
+	echo fstop_camera_dof_ps20b.fxc>> filestocopy.txt
+

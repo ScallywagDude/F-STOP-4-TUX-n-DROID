@@ -1,0 +1,16 @@
+// A photo already contains scene lighting. Preserve it when drawing the paper.
+"VertexLitGeneric"
+{
+	"$model" "1"
+	"$basetexture" "_rt_LargePhoto1"
+	"$selfillum" "1"
+	"$refracttinttexture" "models/photo_capture01_tint"
+	"$detail" "models/photo_capture_border01"
+	"$detailscale" "1"
+	"$detailblendfactor" "1"
+	"$detailblendmode" "7"
+	"Proxies"
+	{
+		"PlacementPhoto" {}
+	}
+}

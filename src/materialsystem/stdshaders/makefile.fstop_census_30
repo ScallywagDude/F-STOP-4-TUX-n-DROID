@@ -1,0 +1,379 @@
+default:  fxctmp9_tmp\Engine_Post_ps30.inc shaders\fxc\Engine_Post_ps30.vcs fxctmp9_tmp\Eyes_vs30.inc shaders\fxc\Eyes_vs30.vcs fxctmp9_tmp\cloak_blended_pass_ps30.inc shaders\fxc\cloak_blended_pass_ps30.vcs fxctmp9_tmp\cloak_blended_pass_vs30.inc shaders\fxc\cloak_blended_pass_vs30.vcs fxctmp9_tmp\debugmorphaccumulator_ps30.inc shaders\fxc\debugmorphaccumulator_ps30.vcs fxctmp9_tmp\debugmorphaccumulator_vs30.inc shaders\fxc\debugmorphaccumulator_vs30.vcs fxctmp9_tmp\decalmodulate_ps30.inc shaders\fxc\decalmodulate_ps30.vcs fxctmp9_tmp\decalmodulate_vs30.inc shaders\fxc\decalmodulate_vs30.vcs fxctmp9_tmp\depthwrite_ps30.inc shaders\fxc\depthwrite_ps30.vcs fxctmp9_tmp\depthwrite_vs30.inc shaders\fxc\depthwrite_vs30.vcs fxctmp9_tmp\engine_post_vs30.inc shaders\fxc\engine_post_vs30.vcs fxctmp9_tmp\eye_refract_ps30.inc shaders\fxc\eye_refract_ps30.vcs fxctmp9_tmp\eye_refract_vs30.inc shaders\fxc\eye_refract_vs30.vcs fxctmp9_tmp\eyes_flashlight_ps30.inc shaders\fxc\eyes_flashlight_ps30.vcs fxctmp9_tmp\eyes_flashlight_vs30.inc shaders\fxc\eyes_flashlight_vs30.vcs fxctmp9_tmp\eyes_ps30.inc shaders\fxc\eyes_ps30.vcs fxctmp9_tmp\flashlight_ps30.inc shaders\fxc\flashlight_ps30.vcs fxctmp9_tmp\lightmappedgeneric_flashlight_vs30.inc shaders\fxc\lightmappedgeneric_flashlight_vs30.vcs fxctmp9_tmp\lightmappedgeneric_ps30.inc shaders\fxc\lightmappedgeneric_ps30.vcs fxctmp9_tmp\lightmappedgeneric_vs30.inc shaders\fxc\lightmappedgeneric_vs30.vcs fxctmp9_tmp\modulate_ps30.inc shaders\fxc\modulate_ps30.vcs fxctmp9_tmp\morphweight_ps30.inc shaders\fxc\morphweight_ps30.vcs fxctmp9_tmp\morphweight_vs30.inc shaders\fxc\morphweight_vs30.vcs fxctmp9_tmp\phong_ps30.inc shaders\fxc\phong_ps30.vcs fxctmp9_tmp\phong_vs30.inc shaders\fxc\phong_vs30.vcs fxctmp9_tmp\shadowbuildtexture_ps30.inc shaders\fxc\shadowbuildtexture_ps30.vcs fxctmp9_tmp\teeth_flashlight_ps30.inc shaders\fxc\teeth_flashlight_ps30.vcs fxctmp9_tmp\teeth_flashlight_vs30.inc shaders\fxc\teeth_flashlight_vs30.vcs fxctmp9_tmp\teeth_ps30.inc shaders\fxc\teeth_ps30.vcs fxctmp9_tmp\teeth_vs30.inc shaders\fxc\teeth_vs30.vcs fxctmp9_tmp\unlitgeneric_ps30.inc shaders\fxc\unlitgeneric_ps30.vcs fxctmp9_tmp\unlitgeneric_vs30.inc shaders\fxc\unlitgeneric_vs30.vcs fxctmp9_tmp\vertexlit_and_unlit_generic_bump_ps30.inc shaders\fxc\vertexlit_and_unlit_generic_bump_ps30.vcs fxctmp9_tmp\vertexlit_and_unlit_generic_bump_vs30.inc shaders\fxc\vertexlit_and_unlit_generic_bump_vs30.vcs fxctmp9_tmp\vertexlit_and_unlit_generic_ps30.inc shaders\fxc\vertexlit_and_unlit_generic_ps30.vcs fxctmp9_tmp\vertexlit_and_unlit_generic_vs30.inc shaders\fxc\vertexlit_and_unlit_generic_vs30.vcs
+
+fxctmp9_tmp\Engine_Post_ps30.inc shaders\fxc\Engine_Post_ps30.vcs: Engine_Post_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_pragmas.h common_hlsl_cpp_consts.h common_fxc.h fxaa3_11_fxc.h common_ps_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" Engine_Post_ps2x.fxc-----Engine_Post_ps30
+	echo Engine_Post_ps2x.fxc>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo fxaa3_11_fxc.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\Eyes_vs30.inc shaders\fxc\Eyes_vs30.vcs: Eyes_vs20.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_fxc.h common_pragmas.h vortwarp_vs20_helper.h common_fog_vs_fxc.h common_vs_fxc.h common_hlsl_cpp_consts.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" Eyes_vs20.fxc-----Eyes_vs30
+	echo Eyes_vs20.fxc>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo vortwarp_vs20_helper.h>> filestocopy.txt
+	echo common_fog_vs_fxc.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+
+fxctmp9_tmp\cloak_blended_pass_ps30.inc shaders\fxc\cloak_blended_pass_ps30.vcs: cloak_blended_pass_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_pragmas.h common_fxc.h common_hlsl_cpp_consts.h common_vertexlitgeneric_dx9.h common_ps_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" cloak_blended_pass_ps2x.fxc-----cloak_blended_pass_ps30
+	echo cloak_blended_pass_ps2x.fxc>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\cloak_blended_pass_vs30.inc shaders\fxc\cloak_blended_pass_vs30.vcs: cloak_blended_pass_vs20.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_fxc.h common_hlsl_cpp_consts.h common_pragmas.h common_vs_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" cloak_blended_pass_vs20.fxc-----cloak_blended_pass_vs30
+	echo cloak_blended_pass_vs20.fxc>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\debugmorphaccumulator_ps30.inc shaders\fxc\debugmorphaccumulator_ps30.vcs: debugmorphaccumulator_ps30.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_ps_fxc.h common_fxc.h common_hlsl_cpp_consts.h common_pragmas.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" debugmorphaccumulator_ps30.fxc-----debugmorphaccumulator_ps30
+	echo debugmorphaccumulator_ps30.fxc>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+
+fxctmp9_tmp\debugmorphaccumulator_vs30.inc shaders\fxc\debugmorphaccumulator_vs30.vcs: debugmorphaccumulator_vs30.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_pragmas.h common_fxc.h common_hlsl_cpp_consts.h common_vs_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" debugmorphaccumulator_vs30.fxc-----debugmorphaccumulator_vs30
+	echo debugmorphaccumulator_vs30.fxc>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\decalmodulate_ps30.inc shaders\fxc\decalmodulate_ps30.vcs: decalmodulate_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_ps_fxc.h common_vertexlitgeneric_dx9.h common_pragmas.h common_fxc.h common_fog_ps_fxc.h shader_constant_register_map.h common_hlsl_cpp_consts.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" decalmodulate_ps2x.fxc-----decalmodulate_ps30
+	echo decalmodulate_ps2x.fxc>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_fog_ps_fxc.h>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+
+fxctmp9_tmp\decalmodulate_vs30.inc shaders\fxc\decalmodulate_vs30.vcs: decalmodulate_vs20.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_vs_fxc.h common_fog_vs_fxc.h common_hlsl_cpp_consts.h common_fxc.h common_pragmas.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" decalmodulate_vs20.fxc-----decalmodulate_vs30
+	echo decalmodulate_vs20.fxc>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo common_fog_vs_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+
+fxctmp9_tmp\depthwrite_ps30.inc shaders\fxc\depthwrite_ps30.vcs: depthwrite_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl 
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" depthwrite_ps2x.fxc-----depthwrite_ps30
+	echo depthwrite_ps2x.fxc>> filestocopy.txt
+
+fxctmp9_tmp\depthwrite_vs30.inc shaders\fxc\depthwrite_vs30.vcs: depthwrite_vs20.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_vs_fxc.h common_hlsl_cpp_consts.h tree_sway.h tessellation_vs_fxc.h common_fxc.h common_pragmas.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" depthwrite_vs20.fxc-----depthwrite_vs30
+	echo depthwrite_vs20.fxc>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo tree_sway.h>> filestocopy.txt
+	echo tessellation_vs_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+
+fxctmp9_tmp\engine_post_vs30.inc shaders\fxc\engine_post_vs30.vcs: engine_post_vs20.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_pragmas.h common_fxc.h common_hlsl_cpp_consts.h common_vs_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" engine_post_vs20.fxc-----engine_post_vs30
+	echo engine_post_vs20.fxc>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\eye_refract_ps30.inc shaders\fxc\eye_refract_ps30.vcs: eye_refract_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_ps_fxc.h common_vertexlitgeneric_dx9.h common_fxc.h common_pragmas.h common_flashlight_fxc.h shader_constant_register_map.h common_fog_ps_fxc.h common_hlsl_cpp_consts.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" eye_refract_ps2x.fxc-----eye_refract_ps30
+	echo eye_refract_ps2x.fxc>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_flashlight_fxc.h>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+	echo common_fog_ps_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+
+fxctmp9_tmp\eye_refract_vs30.inc shaders\fxc\eye_refract_vs30.vcs: eye_refract_vs20.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_hlsl_cpp_consts.h common_vs_fxc.h common_fog_vs_fxc.h vortwarp_vs20_helper.h common_pragmas.h common_fxc.h tessellation_vs_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" eye_refract_vs20.fxc-----eye_refract_vs30
+	echo eye_refract_vs20.fxc>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo common_fog_vs_fxc.h>> filestocopy.txt
+	echo vortwarp_vs20_helper.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo tessellation_vs_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\eyes_flashlight_ps30.inc shaders\fxc\eyes_flashlight_ps30.vcs: eyes_flashlight_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl eyes_flashlight_inc.fxc common_ps_fxc.h common_vertexlitgeneric_dx9.h common_fxc.h common_pragmas.h common_flashlight_fxc.h shader_constant_register_map.h common_fog_ps_fxc.h common_hlsl_cpp_consts.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" eyes_flashlight_ps2x.fxc-----eyes_flashlight_ps30
+	echo eyes_flashlight_ps2x.fxc>> filestocopy.txt
+	echo eyes_flashlight_inc.fxc>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_flashlight_fxc.h>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+	echo common_fog_ps_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+
+fxctmp9_tmp\eyes_flashlight_vs30.inc shaders\fxc\eyes_flashlight_vs30.vcs: eyes_flashlight_vs20.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_pragmas.h common_hlsl_cpp_consts.h common_fxc.h common_vs_fxc.h common_fog_vs_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" eyes_flashlight_vs20.fxc-----eyes_flashlight_vs30
+	echo eyes_flashlight_vs20.fxc>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo common_fog_vs_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\eyes_ps30.inc shaders\fxc\eyes_ps30.vcs: eyes_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_pragmas.h common_fxc.h common_ps_fxc.h common_vertexlitgeneric_dx9.h common_hlsl_cpp_consts.h common_fog_ps_fxc.h shader_constant_register_map.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" eyes_ps2x.fxc-----eyes_ps30
+	echo eyes_ps2x.fxc>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_fog_ps_fxc.h>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+
+fxctmp9_tmp\flashlight_ps30.inc shaders\fxc\flashlight_ps30.vcs: flashlight_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_fxc.h common_pragmas.h common_lightmappedgeneric_fxc.h common_flashlight_fxc.h common_ps_fxc.h common_vertexlitgeneric_dx9.h common_hlsl_cpp_consts.h shader_constant_register_map.h common_fog_ps_supportsvertexfog_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" flashlight_ps2x.fxc-----flashlight_ps30
+	echo flashlight_ps2x.fxc>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_lightmappedgeneric_fxc.h>> filestocopy.txt
+	echo common_flashlight_fxc.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+	echo common_fog_ps_supportsvertexfog_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\lightmappedgeneric_flashlight_vs30.inc shaders\fxc\lightmappedgeneric_flashlight_vs30.vcs: lightmappedgeneric_flashlight_vs20.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_vs_fxc.h common_fxc.h common_hlsl_cpp_consts.h common_pragmas.h common_fog_vs_supportsvertexfog_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" lightmappedgeneric_flashlight_vs20.fxc-----lightmappedgeneric_flashlight_vs30
+	echo lightmappedgeneric_flashlight_vs20.fxc>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fog_vs_supportsvertexfog_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\lightmappedgeneric_ps30.inc shaders\fxc\lightmappedgeneric_ps30.vcs: lightmappedgeneric_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl csm_common_pc_fxc.h common_hlsl_cpp_consts.h csm_blending_fxc.h common_fog_ps_supportsvertexfog_fxc.h csm_common_pc_ps2b_fxc.h common_pragmas.h lightmappedgeneric_ps2_3_x.h common_flashlight_fxc.h common_lightmappedgeneric_fxc.h common_fxc.h csm_common_gameconsole_fxc.h common_ps_fxc.h csm_common_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" lightmappedgeneric_ps2x.fxc-----lightmappedgeneric_ps30
+	echo lightmappedgeneric_ps2x.fxc>> filestocopy.txt
+	echo csm_common_pc_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo csm_blending_fxc.h>> filestocopy.txt
+	echo common_fog_ps_supportsvertexfog_fxc.h>> filestocopy.txt
+	echo csm_common_pc_ps2b_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo lightmappedgeneric_ps2_3_x.h>> filestocopy.txt
+	echo common_flashlight_fxc.h>> filestocopy.txt
+	echo common_lightmappedgeneric_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo csm_common_gameconsole_fxc.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo csm_common_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\lightmappedgeneric_vs30.inc shaders\fxc\lightmappedgeneric_vs30.vcs: lightmappedgeneric_vs20.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_fxc.h common_pragmas.h common_lightmappedgeneric_fxc.h common_fog_vs_supportsvertexfog_fxc.h common_hlsl_cpp_consts.h common_vs_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" lightmappedgeneric_vs20.fxc-----lightmappedgeneric_vs30
+	echo lightmappedgeneric_vs20.fxc>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_lightmappedgeneric_fxc.h>> filestocopy.txt
+	echo common_fog_vs_supportsvertexfog_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\modulate_ps30.inc shaders\fxc\modulate_ps30.vcs: modulate_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_fxc.h common_pragmas.h common_ps_fxc.h common_vertexlitgeneric_dx9.h common_hlsl_cpp_consts.h shader_constant_register_map.h common_fog_ps_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" modulate_ps2x.fxc-----modulate_ps30
+	echo modulate_ps2x.fxc>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+	echo common_fog_ps_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\morphweight_ps30.inc shaders\fxc\morphweight_ps30.vcs: morphweight_ps30.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_pragmas.h common_fxc.h common_hlsl_cpp_consts.h common_ps_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" morphweight_ps30.fxc-----morphweight_ps30
+	echo morphweight_ps30.fxc>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\morphweight_vs30.inc shaders\fxc\morphweight_vs30.vcs: morphweight_vs30.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_hlsl_cpp_consts.h common_fxc.h common_pragmas.h common_vs_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" morphweight_vs30.fxc-----morphweight_vs30
+	echo morphweight_vs30.fxc>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\phong_ps30.inc shaders\fxc\phong_ps30.vcs: phong_ps20b.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl csm_common_pc_ps2b_fxc.h common_fog_ps_fxc.h shader_constant_register_map.h csm_common_pc_fxc.h common_hlsl_cpp_consts.h common_vertexlitgeneric_dx9.h common_flashlight_fxc.h common_pragmas.h csm_common_fxc.h common_ps_fxc.h common_decaltexture_fxc.h csm_common_gameconsole_fxc.h common_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" phong_ps20b.fxc-----phong_ps30
+	echo phong_ps20b.fxc>> filestocopy.txt
+	echo csm_common_pc_ps2b_fxc.h>> filestocopy.txt
+	echo common_fog_ps_fxc.h>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+	echo csm_common_pc_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo common_flashlight_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo csm_common_fxc.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_decaltexture_fxc.h>> filestocopy.txt
+	echo csm_common_gameconsole_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\phong_vs30.inc shaders\fxc\phong_vs30.vcs: phong_vs20.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_vs_fxc.h common_hlsl_cpp_consts.h common_fog_vs_supportsvertexfog_fxc.h common_fxc.h common_pragmas.h tessellation_vs_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" phong_vs20.fxc-----phong_vs30
+	echo phong_vs20.fxc>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_fog_vs_supportsvertexfog_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo tessellation_vs_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\shadowbuildtexture_ps30.inc shaders\fxc\shadowbuildtexture_ps30.vcs: shadowbuildtexture_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_ps_fxc.h common_pragmas.h common_fxc.h common_hlsl_cpp_consts.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" shadowbuildtexture_ps2x.fxc-----shadowbuildtexture_ps30
+	echo shadowbuildtexture_ps2x.fxc>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+
+fxctmp9_tmp\teeth_flashlight_ps30.inc shaders\fxc\teeth_flashlight_ps30.vcs: teeth_flashlight_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_hlsl_cpp_consts.h shader_constant_register_map.h common_fog_ps_fxc.h common_fxc.h common_pragmas.h common_flashlight_fxc.h common_ps_fxc.h common_vertexlitgeneric_dx9.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" teeth_flashlight_ps2x.fxc-----teeth_flashlight_ps30
+	echo teeth_flashlight_ps2x.fxc>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+	echo common_fog_ps_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_flashlight_fxc.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+
+fxctmp9_tmp\teeth_flashlight_vs30.inc shaders\fxc\teeth_flashlight_vs30.vcs: teeth_flashlight_vs20.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_fxc.h common_pragmas.h common_vs_fxc.h common_fog_vs_fxc.h common_hlsl_cpp_consts.h vortwarp_vs20_helper.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" teeth_flashlight_vs20.fxc-----teeth_flashlight_vs30
+	echo teeth_flashlight_vs20.fxc>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo common_fog_vs_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo vortwarp_vs20_helper.h>> filestocopy.txt
+
+fxctmp9_tmp\teeth_ps30.inc shaders\fxc\teeth_ps30.vcs: teeth_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_ps_fxc.h common_vertexlitgeneric_dx9.h common_pragmas.h common_fxc.h common_fog_ps_fxc.h shader_constant_register_map.h common_hlsl_cpp_consts.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" teeth_ps2x.fxc-----teeth_ps30
+	echo teeth_ps2x.fxc>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_fog_ps_fxc.h>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+
+fxctmp9_tmp\teeth_vs30.inc shaders\fxc\teeth_vs30.vcs: teeth_vs20.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl vortwarp_vs20_helper.h common_hlsl_cpp_consts.h common_fog_vs_fxc.h common_vs_fxc.h common_pragmas.h common_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" teeth_vs20.fxc-----teeth_vs30
+	echo teeth_vs20.fxc>> filestocopy.txt
+	echo vortwarp_vs20_helper.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_fog_vs_fxc.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\unlitgeneric_ps30.inc shaders\fxc\unlitgeneric_ps30.vcs: unlitgeneric_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_fxc.h common_hlsl_cpp_consts.h common_pragmas.h common_ps_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" unlitgeneric_ps2x.fxc-----unlitgeneric_ps30
+	echo unlitgeneric_ps2x.fxc>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\unlitgeneric_vs30.inc shaders\fxc\unlitgeneric_vs30.vcs: unlitgeneric_vs20.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl tessellation_vs_fxc.h common_hlsl_cpp_consts.h common_fxc.h common_pragmas.h common_vs_fxc.h common_fog_vs_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" unlitgeneric_vs20.fxc-----unlitgeneric_vs30
+	echo unlitgeneric_vs20.fxc>> filestocopy.txt
+	echo tessellation_vs_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo common_fog_vs_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\vertexlit_and_unlit_generic_bump_ps30.inc shaders\fxc\vertexlit_and_unlit_generic_bump_ps30.vcs: vertexlit_and_unlit_generic_bump_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl shader_constant_register_map.h common_fog_ps_supportsvertexfog_fxc.h csm_common_pc_ps2b_fxc.h common_hlsl_cpp_consts.h csm_common_pc_fxc.h common_vertexlitgeneric_dx9.h common_flashlight_fxc.h common_pragmas.h csm_common_fxc.h common_decaltexture_fxc.h common_ps_fxc.h csm_common_gameconsole_fxc.h common_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" vertexlit_and_unlit_generic_bump_ps2x.fxc-----vertexlit_and_unlit_generic_bump_ps30
+	echo vertexlit_and_unlit_generic_bump_ps2x.fxc>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+	echo common_fog_ps_supportsvertexfog_fxc.h>> filestocopy.txt
+	echo csm_common_pc_ps2b_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo csm_common_pc_fxc.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo common_flashlight_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo csm_common_fxc.h>> filestocopy.txt
+	echo common_decaltexture_fxc.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo csm_common_gameconsole_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\vertexlit_and_unlit_generic_bump_vs30.inc shaders\fxc\vertexlit_and_unlit_generic_bump_vs30.vcs: vertexlit_and_unlit_generic_bump_vs20.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_pragmas.h common_fxc.h tessellation_vs_fxc.h common_hlsl_cpp_consts.h common_vs_fxc.h common_fog_vs_supportsvertexfog_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" vertexlit_and_unlit_generic_bump_vs20.fxc-----vertexlit_and_unlit_generic_bump_vs30
+	echo vertexlit_and_unlit_generic_bump_vs20.fxc>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo tessellation_vs_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo common_fog_vs_supportsvertexfog_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\vertexlit_and_unlit_generic_ps30.inc shaders\fxc\vertexlit_and_unlit_generic_ps30.vcs: vertexlit_and_unlit_generic_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_vertexlitgeneric_dx9.h common_flashlight_fxc.h common_pragmas.h common_fog_ps_supportsvertexfog_fxc.h csm_common_pc_ps2b_fxc.h shader_constant_register_map.h common_hlsl_cpp_consts.h csm_common_pc_fxc.h csm_common_fxc.h common_ps_fxc.h common_decaltexture_fxc.h csm_common_gameconsole_fxc.h common_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" vertexlit_and_unlit_generic_ps2x.fxc-----vertexlit_and_unlit_generic_ps30
+	echo vertexlit_and_unlit_generic_ps2x.fxc>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo common_flashlight_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fog_ps_supportsvertexfog_fxc.h>> filestocopy.txt
+	echo csm_common_pc_ps2b_fxc.h>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo csm_common_pc_fxc.h>> filestocopy.txt
+	echo csm_common_fxc.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_decaltexture_fxc.h>> filestocopy.txt
+	echo csm_common_gameconsole_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\vertexlit_and_unlit_generic_vs30.inc shaders\fxc\vertexlit_and_unlit_generic_vs30.vcs: vertexlit_and_unlit_generic_vs20.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl tessellation_vs_fxc.h common_fxc.h common_pragmas.h common_fog_vs_supportsvertexfog_fxc.h common_vs_fxc.h common_hlsl_cpp_consts.h tree_sway.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" vertexlit_and_unlit_generic_vs20.fxc-----vertexlit_and_unlit_generic_vs30
+	echo vertexlit_and_unlit_generic_vs20.fxc>> filestocopy.txt
+	echo tessellation_vs_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fog_vs_supportsvertexfog_fxc.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo tree_sway.h>> filestocopy.txt
+

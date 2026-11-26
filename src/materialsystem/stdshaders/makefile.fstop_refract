@@ -1,0 +1,32 @@
+default:  fxctmp9_tmp\refract_vs20.inc shaders\fxc\refract_vs20.vcs fxctmp9_tmp\refract_ps20.inc shaders\fxc\refract_ps20.vcs fxctmp9_tmp\refract_ps20b.inc shaders\fxc\refract_ps20b.vcs
+
+fxctmp9_tmp\refract_vs20.inc shaders\fxc\refract_vs20.vcs: refract_vs20.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_vs_fxc.h common_pragmas.h common_fxc.h common_hlsl_cpp_consts.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" refract_vs20.fxc-----refract_vs20
+	echo refract_vs20.fxc>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+
+fxctmp9_tmp\refract_ps20.inc shaders\fxc\refract_ps20.vcs: refract_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_fog_ps_fxc.h common_vertexlitgeneric_dx9.h shader_constant_register_map.h common_hlsl_cpp_consts.h common_ps_fxc.h common_fxc.h common_pragmas.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" refract_ps2x.fxc-----refract_ps20
+	echo refract_ps2x.fxc>> filestocopy.txt
+	echo common_fog_ps_fxc.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+
+fxctmp9_tmp\refract_ps20b.inc shaders\fxc\refract_ps20b.vcs: refract_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_fog_ps_fxc.h common_vertexlitgeneric_dx9.h shader_constant_register_map.h common_hlsl_cpp_consts.h common_ps_fxc.h common_fxc.h common_pragmas.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" refract_ps2x.fxc-----refract_ps20b
+	echo refract_ps2x.fxc>> filestocopy.txt
+	echo common_fog_ps_fxc.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+

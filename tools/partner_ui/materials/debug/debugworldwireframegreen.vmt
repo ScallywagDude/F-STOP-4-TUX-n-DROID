@@ -1,0 +1,8 @@
+"Wireframe"
+{
+	// Engine world wireframe (mat_wireframe); the engine loads it by name
+	"$color" "[ 0.00 1.00 0.00 ]"
+	"$ignorez" 1
+	"$decal" 1
+	"%noToolTexture" 1
+}

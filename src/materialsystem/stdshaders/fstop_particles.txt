@@ -1,0 +1,3 @@
+spritecard_vsxx.fxc
+spritecard_ps2x.fxc
+splinecard_vsxx.fxc

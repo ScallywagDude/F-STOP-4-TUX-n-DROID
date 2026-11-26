@@ -10,15 +10,15 @@ Build the Android ARM64 engine using the existing NDK r10e / host Clang toolchai
 param(
     [string]$ToolchainRoot = $PSScriptRoot,
     [string]$PythonPath,
+    [string]$Components,
     [ValidateRange(1, 128)][int]$Jobs = 12,
     [string[]]$Targets,
-    [switch]$TestHarness,
     [switch]$Install
 )
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$engineRoot = Join-Path $repoRoot 'engine'
+$engineRoot = Join-Path $repoRoot 'src'
 $resolvedTools = (Resolve-Path -LiteralPath $ToolchainRoot).Path
 $ndkRoot = Join-Path $resolvedTools 'android-ndk-r10e'
 $llvmRoot = Join-Path $resolvedTools 'llvm/bin'
@@ -51,9 +51,9 @@ try {
     $env:LLVM_BIN = $llvmRoot
     $env:LLVM_W = $wrapperRoot
     $env:PATH = "$llvmRoot;$env:PATH"
-    $configureArguments = @('waf', 'configure', '-T', 'release', '--android=aarch64,host,21', '--togles', '--use-togl=1', '--use-sdl=1', '--disable-warns', '--build-games=portal', '--prefix=../install', '--check-c-compiler=clang', '--check-cxx-compiler=clang++')
-    if ($TestHarness) { $configureArguments += '--fstop-test-harness' }
-    & $PythonPath @configureArguments
+    $configureArgs = @('waf', 'configure', '-T', 'release', '--android=aarch64,host,21', '--togles', '--use-togl=1', '--use-sdl=1', '--disable-warns', '--build-games=portal', '--prefix=../install', '--check-c-compiler=clang', '--check-cxx-compiler=clang++')
+    if ($Components) { $configureArgs += "--components=$Components" }
+    & $PythonPath @configureArgs
     if ($LASTEXITCODE -ne 0) { throw "Android configuration failed (exit $LASTEXITCODE)." }
 
     $buildArguments = @('waf', 'build', "-j$Jobs")

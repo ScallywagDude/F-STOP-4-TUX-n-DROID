@@ -1,0 +1,10 @@
+"screenspace_general"
+{
+    "$pixshader" "fstop_camera_dof_ps20b"
+    "$basetexture" "_rt_FullFrameFB"
+    "$texture1" "_rt_FullFrameDepth"
+    "$linearread_basetexture" "1"
+    "$linearread_texture1" "1"
+    "$linearwrite" "1"
+    "$pointsample_texture1" "1"
+}

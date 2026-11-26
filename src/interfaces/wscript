@@ -1,0 +1,15 @@
+#!/usr/bin/env python
+# Partner engine interface globals and connection lifecycle.
+
+def options(opt):
+    pass
+
+def configure(conf):
+    pass
+
+def build(bld):
+    bld.stlib(
+        name='interfaces', target='interfaces', source=['interfaces.cpp'],
+        features='c cxx', includes=['../public', '../public/tier0', '../public/tier1'],
+        subsystem=bld.env.MSVC_SUBSYSTEM, idx=bld.get_taskgen_count()
+    )

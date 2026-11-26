@@ -34,7 +34,9 @@ $java = Join-Path $JavaHome 'bin/java.exe'
 $javac = Join-Path $JavaHome 'bin/javac.exe'
 $jar = Join-Path $JavaHome 'bin/jar.exe'
 $aapt = Join-Path $buildTools 'aapt2.exe'
-$zipalign = Join-Path $buildTools 'zipalign.exe'
+# The android-14 zipalign's -p always page-aligns libraries to 4 KB; Android 15+ devices with 16 KB pages need
+# 16 KB (-P 16, added in later build tools), or they load the app in compatibility mode and warn about it.
+$zipalign = Join-Path $toolsRoot 'sdk/bt36/android-16/zipalign.exe'
 $node = (Get-Command node -ErrorAction Stop).Source
 foreach ($requiredFile in @($androidJar, $d8Jar, $signerJar, $java, $javac, $jar, $aapt, $zipalign)) {
     if (-not (Test-Path -LiteralPath $requiredFile -PathType Leaf)) {
@@ -63,7 +65,7 @@ Invoke-Checked $aapt @('compile', '--dir', (Join-Path $launcherRoot 'res'), '-o'
 $linkArguments = @('link', '-o', $baseApk, '-I', $androidJar,
     '--manifest', (Join-Path $launcherRoot 'AndroidManifest.xml'),
     '--min-sdk-version', '24', '--target-sdk-version', '34',
-    '--version-code', '2', '--version-name', '1.1', '--replace-version',
+    '--replace-version', '--version-code', '3', '--version-name', '1.2',
     '--java', (Join-Path $workRoot 'gen'))
 if ($Debuggable) { $linkArguments += '--debug-mode' }
 if (Test-Path -LiteralPath (Join-Path $launcherRoot 'assets') -PathType Container) {
@@ -83,12 +85,12 @@ Copy-Item -LiteralPath (Join-Path $workRoot 'dex/classes.dex') -Destination (Joi
 foreach ($library in $nativeLibraries) {
     Copy-Item -LiteralPath $library.FullName -Destination (Join-Path $workRoot 'stage/lib/arm64-v8a')
 }
-Copy-Item -LiteralPath (Join-Path $repoRoot 'engine/lib/android/aarch64/libSDL2.so') -Destination (Join-Path $workRoot 'stage/lib/arm64-v8a') -Force
+Copy-Item -LiteralPath (Join-Path $repoRoot 'src/lib/android/aarch64/libSDL2.so') -Destination (Join-Path $workRoot 'stage/lib/arm64-v8a') -Force
 $zipArguments = @((Join-Path $PSScriptRoot 'zipadd.js'), $baseApk, (Join-Path $workRoot 'stage'))
 if ($AssetRoot) { $zipArguments += (Resolve-Path -LiteralPath $AssetRoot).Path }
 Invoke-Checked $node $zipArguments
 $alignedApk = Join-Path $workRoot 'aligned.apk'
-Invoke-Checked $zipalign @('-f', '-p', '16384', $baseApk, $alignedApk)
+Invoke-Checked $zipalign @('-f', '-P', '16', '4', $baseApk, $alignedApk)
 
 $savedStorePassword = $env:FSTOP_APK_KEYSTORE_PASSWORD
 $savedKeyPassword = $env:FSTOP_APK_KEY_PASSWORD

@@ -30,7 +30,7 @@ import org.libsdl.app.SDLActivity;
 public class MainActivity extends Activity {
 	private static final String TAG = "FSTOP";
 	private static final String MANIFEST = "fstop_manifest.txt";
-	private static final int DATA_VERSION = 20;
+	private static final int DATA_VERSION = 21;
 
 	private ProgressBar mBar;
 	private TextView mText;
@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		SharedPreferences prefs = getSharedPreferences("fstop", 0);
-		final File root = getExternalFilesDir(null);
+		final File root = com.valvesoftware.ValveActivity2.gameRoot(this);
 		final List<String[]> files = readManifest();
 		if (files.isEmpty() || prefs.getInt("data_version", 0) == DATA_VERSION) {
 			launch();

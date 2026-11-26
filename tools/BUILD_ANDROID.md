@@ -52,12 +52,3 @@ existing `fstop_args.txt` override for local tests. It is omitted by default.
 `assets/`. An APK without bundled game data requires data already installed
 on the device. The helper writes the signed APK to `out/` and verifies its
 signature, but does not install it on a device.
-
-For local device testing only, build with `-TestHarness`, package with
-`-Debuggable`, and add `-fstopcmd` to `fstop_args.txt`. All three switches
-are required for the Android command-file hook. The debug launcher selects
-the app-private `files/fstop_cmd.txt` path; it can be updated using `adb
-shell run-as com.fstop.game`. The hook consumes the file before executing
-each changed command value, preventing replay after an app restart. There
-is no shared-storage fallback or network listener. Ordinary builds omit
-the native hook entirely. Remove `-TestHarness` when building for release.

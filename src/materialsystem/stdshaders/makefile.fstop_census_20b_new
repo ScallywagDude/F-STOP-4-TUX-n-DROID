@@ -1,0 +1,42 @@
+default:  fxctmp9_tmp\luminance_compare_ps20.inc shaders\fxc\luminance_compare_ps20.vcs fxctmp9_tmp\luminance_compare_ps20b.inc shaders\fxc\luminance_compare_ps20b.vcs fxctmp9_tmp\water_ps20.inc shaders\fxc\water_ps20.vcs fxctmp9_tmp\water_ps20b.inc shaders\fxc\water_ps20b.vcs
+
+fxctmp9_tmp\luminance_compare_ps20.inc shaders\fxc\luminance_compare_ps20.vcs: luminance_compare_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_fxc.h common_pragmas.h common_ps_fxc.h common_hlsl_cpp_consts.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" luminance_compare_ps2x.fxc-----luminance_compare_ps20
+	echo luminance_compare_ps2x.fxc>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+
+fxctmp9_tmp\luminance_compare_ps20b.inc shaders\fxc\luminance_compare_ps20b.vcs: luminance_compare_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_fxc.h common_pragmas.h common_ps_fxc.h common_hlsl_cpp_consts.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" luminance_compare_ps2x.fxc-----luminance_compare_ps20b
+	echo luminance_compare_ps2x.fxc>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+
+fxctmp9_tmp\water_ps20.inc shaders\fxc\water_ps20.vcs: water_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_ps_fxc.h common_hlsl_cpp_consts.h common_flashlight_fxc.h common_pragmas.h shader_constant_register_map.h common_vertexlitgeneric_dx9.h common_fxc.h common_fog_ps_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" water_ps2x.fxc-----water_ps20
+	echo water_ps2x.fxc>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_flashlight_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_fog_ps_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\water_ps20b.inc shaders\fxc\water_ps20b.vcs: water_ps2x.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_ps_fxc.h common_hlsl_cpp_consts.h common_flashlight_fxc.h common_pragmas.h shader_constant_register_map.h common_vertexlitgeneric_dx9.h common_fxc.h common_fog_ps_fxc.h
+	perl C:\Users\doge6\Documents\GitHub\csgo_partner\src\devtools\bin\fxc_prep.pl    -source "C:\Users\doge6\Documents\GitHub\csgo_partner\src" water_ps2x.fxc-----water_ps20b
+	echo water_ps2x.fxc>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_flashlight_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_fog_ps_fxc.h>> filestocopy.txt
+

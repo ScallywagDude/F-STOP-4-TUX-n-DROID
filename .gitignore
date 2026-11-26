@@ -1,14 +1,33 @@
-# game data and build output stay out of the repository
-fsdata/
-maps/
-out/
+# build output, game data, keys and local files stay out of the repository
 .port-build/
+src/build/
+src/out/
+src/.waf*/
+src/.lock-waf*
+install/
+out/
 apkbuild/
 keys/
-fstop_libs/
-engine/build/
-/install/
+fsdata/
+tools/tests/
+__pycache__/
 *.apk
 *.idsig
-*.o
-.lock-waf*
+*.keystore
+*.jks
+*.mdmp
+
+# libraries over GitHub's 100 MB limit; they come from src.7z.001
+/src/lib/public/linux64/panorama_client_client.a
+/src/lib/win32/2015/debug/cryptlib.lib
+/src/lib/win32/2015/release/cryptlib.lib
+/src/lib/win32/debug/cryptlib.lib
+/src/lib/win32/release/cryptlib.lib
+/src/lib/win64/2015/debug/cryptlib.lib
+/src/lib/win64/2015/release/cryptlib.lib
+/src/lib/win64/debug/cryptlib.lib
+/src/lib/win64/release/cryptlib.lib
+/src/thirdparty/scaleform/sdk42/Lib/MacOS-x86_64/Shipping/libgfx.a
+/src/thirdparty/scaleform/sdk42/Lib/MacOS-x86_64/Shipping/libgfx_as3.a
+/src/thirdparty/scaleform/sdk42/Lib/x86_64-linux/shipping/libgfx.a
+/src/thirdparty/scaleform/sdk42/Lib/x86_64-linux/shipping/libgfx_as3.a
